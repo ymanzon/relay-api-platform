@@ -5,7 +5,7 @@
 const API='';
 let allEvs=[],preEvs=[],postEvs=[],curKey='',curEpId='',parsedCurlData=null,curExec=null;
 let histRows=[],histReady=false,histTmr=null;
-let dashReady=false,dashTmr=null,drillId=null,charts={},testBlob=null;
+let dashReady=false,dashTmr=null,drillId=null,charts={};
 
 const THEMES={
   dark:{'--bg':'#080c12','--card':'#0e141d','--surf':'#141c27','--raised':'#1b2436','--border':'#1e2a3a','--bsoft':'#18232f','--a':'#00f5a8','--adim':'rgba(0,245,168,.1)','--aglow':'rgba(0,245,168,.3)','--blue':'#4da6ff','--bdim':'rgba(77,166,255,.12)','--purple':'#a97dff','--pdim':'rgba(169,125,255,.12)','--warn':'#ffbc42','--wdim':'rgba(255,188,66,.12)','--danger':'#ff5757','--ddim':'rgba(255,87,87,.12)','--ok':'#00d98b','--okdim':'rgba(0,217,139,.12)','--teal':'#00d9f5','--tdim':'rgba(0,217,245,.12)','--t1':'#e8edf5','--t2':'#7d8fa6','--t3':'#384860'},
@@ -659,6 +659,9 @@ function renderHistLog(){
     const d=new Date(ex.startedAt);const ts=d.toLocaleDateString('en',{month:'2-digit',day:'2-digit'})+' '+d.toLocaleTimeString('en',{hour12:false});
     const hc=ex.responseStatus<300?'var(--a)':ex.responseStatus<500?'var(--warn)':'var(--danger)';
     const dc=ex.totalDurationMs<200?'dfast':ex.totalDurationMs<1000?'dmid':'dslow';
+    
+    const json = encodeURIComponent(JSON.stringify(ex));
+    
     return `<div class="logrow ${ex.status==='error'?'lerr':''}" data-id="${ex._id}">
       <input type="checkbox" class="rck row-chk" data-id="${ex._id}" onchange="onRowChk()"/>
       <span style="color:var(--t3);font-size:.6rem">${ts}</span>
@@ -667,7 +670,7 @@ function renderHistLog(){
       <span style="font-size:.64rem;font-weight:700;color:${ex.status==='success'?'var(--a)':'var(--danger)'}">${ex.status}</span>
       <span><span class="badge ${ex.mode==='proxy'?'bproxy':'bmock'}" style="font-size:.56rem">${ex.mode}</span></span>
       <span class="${dc}" style="font-family:var(--mono)">${ex.totalDurationMs}ms</span>
-      <span style="color:var(--t2);font-size:.66rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" onclick='showExec(${JSON.stringify(ex)})'><span style="color:var(--t3)">/api/</span>${ex.virtualPath}</span>
+      <span style="color:var(--t2);font-size:.66rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer" data-ex="${json}" onclick='showExec(this)'><span style="color:var(--t3)">/api/</span>${ex.virtualPath}</span>
       <span>${ex.cacheHit?'<i class="material-icons" style="font-size:.7rem;color:var(--teal)">bolt</i>':''}</span>
     </div>`;
   }).join('');
@@ -676,8 +679,9 @@ function onRowChk(){const n=document.querySelectorAll('.row-chk:checked').length
 function toggleSelAll(){const on=document.getElementById('sel-all').checked;document.querySelectorAll('.row-chk').forEach(c=>c.checked=on);onRowChk();}
 async function delSelected(){const ids=[...document.querySelectorAll('.row-chk:checked')].map(c=>c.dataset.id);if(!ids.length)return;if(!confirm(`Delete ${ids.length} record(s)?`))return;try{const r=await api('/catalog/executions/bulk',{method:'DELETE',body:JSON.stringify({ids})});toast(`${r.deleted} deleted ✓`);histRows=histRows.filter(row=>!ids.includes(row._id));renderHistLog();setTxt('h-cnt',histRows.length);setTxt('h-sel',0);document.getElementById('btn-del-sel').style.display='none';document.getElementById('sel-all').checked=false;}catch{toast('Error',true);}}
 async function confDelAll(){const range=document.getElementById('h-range')?.value||'all';const epId=document.getElementById('h-ep')?.value||'';if(!confirm(`Delete ALL records?`))return;try{const body={};if(epId)body.endpointId=epId;if(range!=='all')body.range=range;const r=await api('/catalog/executions/bulk',{method:'DELETE',body:JSON.stringify(body)});toast(`${r.deleted} deleted ✓`);loadHist(true);}catch{toast('Error',true);}}
-function showExec(ex){
-  curExec=ex;
+function showExec(elx){
+  const ex = JSON.parse(decodeURIComponent(elx.dataset.ex));
+  curExec = ex;
   document.getElementById('exec-title').textContent=`${ex.method} /api/${ex.virtualPath}`;
   const sc=ex.status==='success'?'var(--a)':'var(--danger)';
   document.getElementById('exec-kpis').innerHTML=`
@@ -2379,8 +2383,8 @@ async function previewImport() {
       const rows = [];
       for (const [path, item] of Object.entries(paths)) {
         for (const method of methods) {
-          if (!(item as any)[method]) continue;
-          const op = (item as any)[method];
+          if (!(item )[method]) continue;
+          const op = (item )[method];
           const tag = op.tags?.[0] || '';
           rows.push({ method: method.toUpperCase(), path, summary: op.summary || op.operationId || path, tag });
         }

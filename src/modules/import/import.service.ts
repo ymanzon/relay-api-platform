@@ -1,7 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { EndpointsService } from '../endpoints/endpoints.service';
+import { ParamConfigDto } from '../endpoints/dto/create-endpoint.dto';
 
-interface ImportResult {
+export interface ImportResult {
   created:  number;
   skipped:  number;
   errors:   { path: string; method: string; reason: string }[];
@@ -91,7 +92,7 @@ export class ImportService {
             description: operation.description || '',
             virtualPath,
             method:      httpMethod as any,
-            queryParams,
+            queryParams: ParamConfigDto as any,
             bodyParams,
             mockResponse,
             enabled:     true,
