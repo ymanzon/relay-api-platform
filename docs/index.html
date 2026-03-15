@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Relay — Self-hosted API Gateway Platform. Proxy, mock, secure, and monitor any API endpoint."/>
+<title>Relay API Platform — Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #060810;
+  --bg2: #0c0f1a;
+  --bg3: #111520;
+  --card: #141824;
+  --border: rgba(255,255,255,.07);
+  --border2: rgba(255,255,255,.12);
+  --t1: #f0f3ff;
+  --t2: #a8b0cc;
+  --t3: #5a6380;
+  --a: #4f8bff;
+  --a2: #2563eb;
+  --g: #22d86e;
+  --g2: #16a34a;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --purple: #a78bfa;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+  --r: 10px;
+  --rs: 6px;
+  --glow-a: 0 0 40px rgba(79,139,255,.15);
+  --glow-g: 0 0 40px rgba(34,216,110,.10);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--sans);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE ─────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+}
+
+/* ── NAV ───────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(6,8,16,.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 max(24px, env(safe-area-inset-left));
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.nav-logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #2563eb, #4f8bff);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(79,139,255,.4);
+}
+.nav-logo-mark svg { width: 16px; height: 16px; }
+.nav-brand { font-size: .95rem; font-weight: 700; color: var(--t1); letter-spacing: -.01em; }
+.nav-brand em { color: var(--a); font-style: normal; }
+.nav-links { display: flex; gap: 4px; }
+.nav-link {
+  padding: 6px 14px;
+  border-radius: var(--rs);
+  font-size: .8rem; font-weight: 500;
+  color: var(--t3); text-decoration: none;
+  transition: color .15s, background .15s;
+}
+.nav-link:hover { color: var(--t1); background: rgba(255,255,255,.06); }
+.nav-cta {
+  background: var(--a); color: #fff;
+  padding: 7px 18px; border-radius: var(--rs);
+  font-size: .8rem; font-weight: 600;
+  text-decoration: none;
+  transition: background .15s, box-shadow .15s;
+}
+.nav-cta:hover { background: var(--a2); box-shadow: 0 0 20px rgba(79,139,255,.4); }
+@media(max-width:640px) { .nav-links { display: none; } }
+
+/* ── HERO ──────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 80px 24px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(79,139,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,139,255,.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 80%);
+}
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(ellipse, rgba(79,139,255,.12) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%, -60%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(79,139,255,.1);
+  border: 1px solid rgba(79,139,255,.25);
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-size: .72rem; font-weight: 600;
+  color: var(--a);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  position: relative;
+}
+.badge-dot {
+  width: 6px; height: 6px;
+  background: var(--g);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--g);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -.03em;
+  margin-bottom: 24px;
+  position: relative;
+}
+.hero h1 .line2 {
+  background: linear-gradient(135deg, var(--a) 0%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(.95rem, 2vw, 1.15rem);
+  color: var(--t2);
+  max-width: 560px;
+  margin-bottom: 40px;
+  font-weight: 400;
+  position: relative;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; position: relative; }
+.btn-primary {
+  background: var(--a);
+  color: #fff;
+  padding: 13px 28px;
+  border-radius: var(--r);
+  font-weight: 600; font-size: .9rem;
+  text-decoration: none;
+  transition: all .2s;
+  box-shadow: 0 0 0 rgba(79,139,255,0);
+}
+.btn-primary:hover { background: var(--a2); box-shadow: 0 0 30px rgba(79,139,255,.4); transform: translateY(-1px); }
+.btn-secondary {
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border2);
+  color: var(--t1);
+  padding: 13px 28px;
+  border-radius: var(--r);
+  font-weight: 500; font-size: .9rem;
+  text-decoration: none;
+  transition: all .2s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); }
+
+/* ── TERMINAL PREVIEW ──────────────────────────────── */
+.hero-terminal {
+  margin-top: 60px;
+  width: 100%; max-width: 700px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,.5), var(--glow-a);
+  position: relative;
+}
+.terminal-bar {
+  background: var(--bg3);
+  padding: 11px 16px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.terminal-dot { width: 11px; height: 11px; border-radius: 50%; }
+.terminal-body {
+  padding: 20px 24px;
+  font-family: var(--mono);
+  font-size: .78rem;
+  line-height: 1.9;
+}
+.t-cmd { color: var(--g); }
+.t-comment { color: var(--t3); }
+.t-url { color: var(--a); }
+.t-key { color: var(--purple); }
+.t-val { color: var(--warn); }
+.t-out { color: var(--t2); }
+.t-ok { color: var(--g); }
+.t-prompt { color: var(--t3); }
+
+/* ── SECTIONS ──────────────────────────────────────── */
+section { padding: 100px 24px; position: relative; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: .69rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--a); margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700; letter-spacing: -.02em;
+  line-height: 1.15;
+  margin-bottom: 18px;
+}
+.section-sub {
+  font-size: 1rem; color: var(--t2);
+  max-width: 560px; margin-bottom: 52px;
+}
+
+/* ── FEATURE GRID ──────────────────────────────────── */
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.feat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.feat-card:hover { border-color: var(--border2); box-shadow: 0 0 30px rgba(0,0,0,.3); }
+.feat-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+.feat-title { font-weight: 700; font-size: .9rem; margin-bottom: 6px; color: var(--t1); }
+.feat-desc { font-size: .78rem; color: var(--t2); line-height: 1.65; }
+
+/* ── PIPELINE ──────────────────────────────────────── */
+.pipeline {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.pipeline-step {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  transition: background .15s;
+}
+.pipeline-step:last-child { border-bottom: none; }
+.pipeline-step:hover { background: rgba(255,255,255,.025); }
+.step-num {
+  width: 28px; height: 28px; flex-shrink: 0;
+  background: rgba(79,139,255,.12);
+  border: 1px solid rgba(79,139,255,.25);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: .7rem; font-weight: 600;
+  color: var(--a);
+}
+.step-info { flex: 1; }
+.step-name { font-weight: 600; font-size: .85rem; margin-bottom: 3px; }
+.step-desc { font-size: .74rem; color: var(--t2); }
+.step-tag {
+  font-size: .6rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px;
+  letter-spacing: .06em; text-transform: uppercase;
+  flex-shrink: 0;
+}
+.tag-security { background: rgba(239,68,68,.12); color: var(--danger); }
+.tag-crypto   { background: rgba(167,139,250,.12); color: var(--purple); }
+.tag-core     { background: rgba(79,139,255,.12); color: var(--a); }
+.tag-event    { background: rgba(245,158,11,.12); color: var(--warn); }
+.tag-cache    { background: rgba(34,216,110,.12); color: var(--g); }
+
+/* ── EXAMPLES ──────────────────────────────────────── */
+.examples-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.example-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.example-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.example-num {
+  font-family: var(--mono); font-size: .65rem; font-weight: 600;
+  color: var(--a); background: rgba(79,139,255,.1);
+  border: 1px solid rgba(79,139,255,.2);
+  padding: 3px 8px; border-radius: 5px;
+  flex-shrink: 0; margin-top: 2px;
+}
+.example-title { font-weight: 700; font-size: .88rem; margin-bottom: 4px; }
+.example-situation { font-size: .72rem; color: var(--t3); line-height: 1.5; }
+.example-body { padding: 16px 20px; }
+.code-block {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: .7rem;
+  line-height: 1.8;
+  overflow-x: auto;
+  color: var(--t2);
+}
+.code-block .ck { color: var(--a); }
+.code-block .cv { color: var(--g); }
+.code-block .cc { color: var(--t3); font-style: italic; }
+.code-block .cm { color: var(--warn); }
+.code-block .cs { color: var(--purple); }
+.example-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(34,216,110,.05);
+  border: 1px solid rgba(34,216,110,.15);
+  border-radius: 8px;
+  font-size: .71rem; color: var(--g);
+  font-family: var(--mono);
+}
+
+/* ── API TABLE ─────────────────────────────────────── */
+.api-section { margin-bottom: 40px; }
+.api-section-title {
+  font-size: .78rem; font-weight: 700;
+  color: var(--a); text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.api-table { width: 100%; border-collapse: collapse; }
+.api-table th {
+  text-align: left; padding: 9px 14px;
+  font-size: .69rem; font-weight: 700;
+  color: var(--t3); text-transform: uppercase;
+  letter-spacing: .07em;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.api-table td {
+  padding: 11px 14px;
+  font-size: .78rem;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  vertical-align: top;
+}
+.api-table tr:hover td { background: rgba(255,255,255,.02); }
+.method {
+  font-family: var(--mono); font-size: .67rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px;
+  display: inline-block;
+}
+.m-get    { background: rgba(34,216,110,.12); color: var(--g); }
+.m-post   { background: rgba(79,139,255,.12); color: var(--a); }
+.m-put    { background: rgba(245,158,11,.12); color: var(--warn); }
+.m-delete { background: rgba(239,68,68,.12); color: var(--danger); }
+.m-any    { background: rgba(167,139,250,.12); color: var(--purple); }
+.path-cell { font-family: var(--mono); font-size: .72rem; color: var(--t1); }
+
+/* ── ENV TABLE ─────────────────────────────────────── */
+.env-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+.env-table th {
+  text-align: left; padding: 9px 14px;
+  font-size: .69rem; font-weight: 700; color: var(--t3);
+  text-transform: uppercase; letter-spacing: .07em;
+  border-bottom: 1px solid var(--border);
+}
+.env-table td {
+  padding: 12px 14px;
+  font-size: .8rem;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.env-table code {
+  font-family: var(--mono); font-size: .72rem;
+  background: rgba(255,255,255,.06);
+  padding: 2px 7px; border-radius: 4px;
+}
+.req-yes { color: var(--g); font-weight: 700; }
+
+/* ── INSTALL STEPS ─────────────────────────────────── */
+.install-steps { display: flex; flex-direction: column; gap: 20px; }
+.install-step {
+  display: flex; gap: 20px; align-items: flex-start;
+}
+.install-step-num {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--a), var(--purple));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .85rem;
+  box-shadow: 0 4px 12px rgba(79,139,255,.3);
+}
+.install-step-content { flex: 1; }
+.install-step-title { font-weight: 700; font-size: .9rem; margin-bottom: 8px; }
+.install-step pre {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: .75rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: var(--t2);
+}
+.install-step pre .cmd { color: var(--g); }
+.install-step pre .cmt { color: var(--t3); }
+.install-step pre .key { color: var(--a); }
+.install-step pre .val { color: var(--warn); }
+
+/* ── FOOTER ────────────────────────────────────────── */
+footer {
+  padding: 60px 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.footer-inner { max-width: 600px; margin: 0 auto; }
+.footer-logo { font-size: 1.5rem; font-weight: 700; color: var(--t1); margin-bottom: 12px; }
+.footer-logo em { color: var(--a); font-style: normal; }
+.footer-sub { font-size: .8rem; color: var(--t3); margin-bottom: 28px; }
+.footer-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.footer-links a { font-size: .8rem; color: var(--t3); text-decoration: none; transition: color .15s; }
+.footer-links a:hover { color: var(--a); }
+
+/* ── MISC ──────────────────────────────────────────── */
+.divider { height: 1px; background: var(--border); margin: 0 24px; }
+.tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.tag {
+  font-size: .65rem; font-weight: 600;
+  padding: 4px 10px; border-radius: 100px;
+  letter-spacing: .05em;
+}
+.tag-blue { background: rgba(79,139,255,.12); color: var(--a); border: 1px solid rgba(79,139,255,.2); }
+.tag-green { background: rgba(34,216,110,.10); color: var(--g); border: 1px solid rgba(34,216,110,.2); }
+.tag-purple { background: rgba(167,139,250,.10); color: var(--purple); border: 1px solid rgba(167,139,250,.2); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 9l3-5 3 8 3-8 3 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="nav-brand">Re<em>lay</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="#features"  class="nav-link">Features</a>
+    <a href="#pipeline"  class="nav-link">How it Works</a>
+    <a href="#examples"  class="nav-link">Examples</a>
+    <a href="#install"   class="nav-link">Install</a>
+    <a href="#api"       class="nav-link">API</a>
+  </div>
+  <a href="https://github.com/your-username/relay-api-platform" class="nav-cta">View on GitHub →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Open Source · Self-Hosted · No Cloud Required
+  </div>
+
+  <h1>
+    Your APIs.<br/>
+    <span class="line2">Under Control.</span>
+  </h1>
+
+  <p class="hero-sub">
+    Relay is a self-hosted API gateway that proxies, mocks, secures, and monitors
+    every HTTP endpoint — with a beautiful dashboard, no configuration files, and no vendor lock-in.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#install" class="btn-primary">Get Started Free</a>
+    <a href="#examples" class="btn-secondary">See Examples</a>
+  </div>
+
+  <div class="hero-terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#ff5f56"></div>
+      <div class="terminal-dot" style="background:#ffbd2e"></div>
+      <div class="terminal-dot" style="background:#27c93f"></div>
+      <span style="font-family:var(--mono);font-size:.7rem;color:var(--t3);margin-left:8px">relay — proxy engine</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-prompt">$</span> <span class="t-cmd">curl</span> <span class="t-url">"http://localhost:3000/api/weather?q=London"</span></div>
+      <div style="color:var(--t3);font-size:.68rem;margin:.4rem 0">
+        <span style="color:var(--a)">→</span> Relay resolves <span class="t-key">{{WEATHER_KEY}}</span> from encrypted vault<br/>
+        <span style="color:var(--a)">→</span> Applies rate limit: <span class="t-val">47/60</span> requests remaining (per IP)<br/>
+        <span style="color:var(--a)">→</span> Forwards to <span class="t-url">api.openweathermap.org</span> · 84ms
+      </div>
+      <div><span class="t-key">{</span></div>
+      <div>&nbsp;&nbsp;<span class="t-key">"city"</span>: <span class="t-val">"London"</span>,</div>
+      <div>&nbsp;&nbsp;<span class="t-key">"temp"</span>: <span class="t-val">14.2</span>,</div>
+      <div>&nbsp;&nbsp;<span class="t-key">"weather"</span>: <span class="t-val">"Partly cloudy"</span>,</div>
+      <div>&nbsp;&nbsp;<span class="t-key">"_meta"</span>: { <span class="t-key">"mode"</span>: <span class="t-val">"proxy"</span>, <span class="t-key">"totalDurationMs"</span>: <span class="t-val">84</span> }</div>
+      <div><span class="t-key">}</span></div>
+      <div style="margin-top:.6rem"><span class="t-ok">✓</span> <span style="color:var(--t3)">Execution logged · API key never exposed to client</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" style="background:var(--bg2)">
+  <div class="section-inner">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything an API needs,<br/>nothing it doesn't.</h2>
+    <p class="section-sub">Built for developers who want control without complexity.</p>
+
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(79,139,255,.1)">🔀</div>
+        <div class="feat-title">Dynamic Proxy Engine</div>
+        <div class="feat-desc">Route any HTTP method to any backend URL. Inject headers, resolve secrets, set timeouts. Zero config files — everything lives in MongoDB.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(34,216,110,.1)">🎭</div>
+        <div class="feat-title">Instant Mock Server</div>
+        <div class="feat-desc">Return custom JSON, status codes, and artificial delays without a backend. Switch from mock to proxy by adding a Destination URL.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(239,68,68,.1)">🛡️</div>
+        <div class="feat-title">Security Per Endpoint</div>
+        <div class="feat-desc">Rate limiting, IP allowlists/blocklists, device fingerprinting, HMAC signing, threat detection (SQLi, XSS, path traversal) — all toggleable per endpoint.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(167,139,250,.1)">🔐</div>
+        <div class="feat-title">Encrypted Secrets Vault</div>
+        <div class="feat-desc">Store API keys, tokens, and passwords encrypted with AES-256-GCM. Reference them as <code style="font-family:var(--mono);color:var(--purple)">{{SECRET_NAME}}</code> in URLs and headers.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(245,158,11,.1)">⚡</div>
+        <div class="feat-title">Pre/Post Event Scripts</div>
+        <div class="feat-desc">Run JavaScript before (PRE) or after (POST) every proxy call. Inject headers, transform requests, call webhooks, log to external systems.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(34,216,110,.1)">🌿</div>
+        <div class="feat-title">Environments & Variables</div>
+        <div class="feat-desc">Define variable sets (dev, staging, prod) and switch with one click. Use <code style="font-family:var(--mono);color:var(--g)">[[BASE_URL]]</code> in endpoint URLs — no edits needed when switching.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(79,139,255,.1)">📥</div>
+        <div class="feat-title">OpenAPI Import</div>
+        <div class="feat-desc">Bulk-create endpoints from Swagger 2.x or OpenAPI 3.x specs. Paste JSON, upload a file, or fetch from a URL. Parameters and mocks auto-populated.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(245,158,11,.1)">📤</div>
+        <div class="feat-title">Multi-Format Export</div>
+        <div class="feat-desc">Export any collection as Postman v2.1, Insomnia v4, OpenAPI 3.0 YAML, or a k6 load test script. Share with your team in seconds.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(167,139,250,.1)">📊</div>
+        <div class="feat-title">Analytics Dashboard</div>
+        <div class="feat-desc">Request timeline, p95/p99 latency, error rates, top endpoints, execution drill-down. 8 live KPIs with delta indicators vs. previous period.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS — PIPELINE -->
+<section id="pipeline">
+  <div class="section-inner">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">The 10-step proxy pipeline.</h2>
+    <p class="section-sub">Every request passes through this sequence — each step can block, transform, or enrich the request before it reaches your backend.</p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <div class="step-name">Endpoint Lookup</div>
+          <div class="step-desc">Match the virtual path and HTTP method against enabled endpoints. Returns 404 if no match.</div>
+        </div>
+        <span class="step-tag tag-core">core</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <div class="step-name">API Key Validation</div>
+          <div class="step-desc">If the endpoint requires an API key, verify the <code style="font-family:var(--mono);color:var(--t2)">x-api-key</code> header or query param. Returns 401 if missing or invalid.</div>
+        </div>
+        <span class="step-tag tag-security">security</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2.5</div>
+        <div class="step-info">
+          <div class="step-name">Security Pipeline</div>
+          <div class="step-desc">CORS check → IP blocklist/allowlist → Device fingerprint block → Body size limit → HMAC signature → Threat detection → Rate limiting. Each check can return 400/401/403/413/429.</div>
+        </div>
+        <span class="step-tag tag-security">security</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <div class="step-name">Cache Read</div>
+          <div class="step-desc">Check in-memory cache with key derived from endpoint ID + sorted query + body. On HIT, skip all remaining steps and return cached response.</div>
+        </div>
+        <span class="step-tag tag-cache">cache</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">3.5</div>
+        <div class="step-info">
+          <div class="step-name">Environment Variables</div>
+          <div class="step-desc">Resolve <code style="font-family:var(--mono);color:var(--g)">[[VAR_NAME]]</code> placeholders in the destination URL and headers using the active environment's variable map.</div>
+        </div>
+        <span class="step-tag tag-crypto">env</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">4</div>
+        <div class="step-info">
+          <div class="step-name">Secrets Resolution</div>
+          <div class="step-desc">Decrypt and inject <code style="font-family:var(--mono);color:var(--purple)">{{SECRET_NAME}}</code> values into the destination URL and headers. Values never appear in logs or the database.</div>
+        </div>
+        <span class="step-tag tag-crypto">crypto</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">5</div>
+        <div class="step-info">
+          <div class="step-name">Parameter Validation</div>
+          <div class="step-desc">Check that all declared required query params and body fields are present. Errors are recorded in the execution log but do not block the request.</div>
+        </div>
+        <span class="step-tag tag-core">core</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">6</div>
+        <div class="step-info">
+          <div class="step-name">PRE Events</div>
+          <div class="step-desc">Execute attached PRE event scripts or webhooks. Scripts receive <code style="font-family:var(--mono);color:var(--t2)">ctx</code> with the request, endpoint, secrets proxy, and mutable extras map.</div>
+        </div>
+        <span class="step-tag tag-event">event</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">7</div>
+        <div class="step-info">
+          <div class="step-name">Proxy or Mock</div>
+          <div class="step-desc">If a Destination URL is set: forward the request via Axios and return the real response. If not: serve the configured mock response (with optional artificial delay).</div>
+        </div>
+        <span class="step-tag tag-core">core</span>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">8</div>
+        <div class="step-info">
+          <div class="step-name">POST Events + Cache Write + Execution Log</div>
+          <div class="step-desc">Execute POST event scripts, write the response to cache if applicable, and persist the full execution record to MongoDB for analytics and audit.</div>
+        </div>
+        <span class="step-tag tag-event">event</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAMPLES -->
+<section id="examples" style="background:var(--bg2)">
+  <div class="section-inner">
+    <div class="section-label">Usage Examples</div>
+    <h2 class="section-title">Real scenarios, solved.</h2>
+    <p class="section-sub">From hiding API keys to multi-environment deployments — Relay handles it.</p>
+
+    <div class="examples-grid">
+
+      <div class="example-card">
+        <div class="example-header">
+          <span class="example-num">01</span>
+          <div>
+            <div class="example-title">Hide a third-party API key</div>
+            <div class="example-situation">Your frontend needs weather data but you can't expose your API key in browser requests.</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="code-block">
+<span class="cc"># Store your key as an encrypted secret</span>
+<span class="ck">Secrets → New</span>
+<span class="cm">Name:</span>  <span class="cv">WEATHER_KEY</span>
+<span class="cm">Value:</span> your_api_key
+
+<span class="cc"># Set endpoint Destination URL</span>
+<span class="cv">https://api.weather.com/data?</span>
+<span class="cv">  appid=</span><span class="cs">{{WEATHER_KEY}}</span>
+
+<span class="cc"># Call from browser — key never exposed</span>
+<span class="ck">curl</span> http://localhost:3000/api/weather</div>
+          <div class="example-result">✓ Key resolved server-side · Never visible to clients</div>
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">
+          <span class="example-num">02</span>
+          <div>
+            <div class="example-title">Mock API for frontend dev</div>
+            <div class="example-situation">Your frontend team is blocked waiting for the backend team. You need realistic responses now.</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="code-block">
+<span class="cc"># Create endpoint — no Destination URL</span>
+<span class="ck">Method:</span>  <span class="cv">GET</span>
+<span class="ck">Path:</span>    <span class="cv">users/:id</span>
+<span class="ck">Mock body:</span>
+<span class="cs">{ "id": "usr_1", "name": "Jane" }</span>
+<span class="ck">Status:</span>  <span class="cv">200</span>
+<span class="ck">Delay:</span>   <span class="cv">150ms</span>
+
+<span class="cc"># Returns mock instantly</span>
+<span class="ck">curl</span> http://localhost:3000/api/users/any-id</div>
+          <div class="example-result">✓ Add Destination URL later to switch to real backend</div>
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">
+          <span class="example-num">03</span>
+          <div>
+            <div class="example-title">Rate limit a public endpoint</div>
+            <div class="example-situation">An endpoint is open to the public and you need to prevent spam and DDoS without external tooling.</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="code-block">
+<span class="cc"># Security tab → Rate Limit</span>
+<span class="ck">Strategy:</span>       <span class="cv">Per IP address</span>
+<span class="ck">Max Requests:</span>   <span class="cv">30</span>
+<span class="ck">Window:</span>         <span class="cv">60 seconds</span>
+<span class="ck">Block Duration:</span> <span class="cv">300 seconds</span>
+
+<span class="cc"># Response after limit exceeded</span>
+<span class="cm">HTTP 429</span>  Retry-After: 300
+<span class="cs">X-RateLimit-Limit: 30</span>
+<span class="cs">X-RateLimit-Remaining: 0</span></div>
+          <div class="example-result">✓ Every blocked attempt logged with IP + fingerprint</div>
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">
+          <span class="example-num">04</span>
+          <div>
+            <div class="example-title">Multi-environment deployment</div>
+            <div class="example-situation">Same API structure across dev, staging, and production. Switching targets shouldn't require editing every endpoint.</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="code-block">
+<span class="cc"># Create environments with BASE_URL variable</span>
+<span class="ck">Dev:</span>  <span class="cv">BASE_URL = http://localhost:8080</span>
+<span class="ck">Stg:</span>  <span class="cv">BASE_URL = https://staging.api.co</span>
+<span class="ck">Prod:</span> <span class="cv">BASE_URL = https://api.company.com</span>
+
+<span class="cc"># Endpoint Destination URL</span>
+<span class="cs">[[BASE_URL]]</span><span class="cv">/v2/orders</span>
+
+<span class="cc"># Switch via nav bar dropdown</span>
+<span class="cv">No endpoint edits needed</span></div>
+          <div class="example-result">✓ Combine with secrets: [[BASE_URL]]/v2?key={{TOKEN}}</div>
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">
+          <span class="example-num">05</span>
+          <div>
+            <div class="example-title">Import from Swagger / OpenAPI</div>
+            <div class="example-situation">You have an existing API spec and want all 50 endpoints created in Relay without clicking through forms.</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="code-block">
+<span class="cc"># Environments page → Import Spec</span>
+<span class="cc"># Paste JSON, upload file, or URL:</span>
+<span class="cv">https://petstore.swagger.io/v2/swagger.json</span>
+
+<span class="cc"># Click Preview, then Import</span>
+<span class="ck">Result:</span>
+<span class="cv">✓ 18 created</span>
+<span class="cs">  Skipped: 2 (duplicates)</span>
+<span class="cs">  Grouped by tags → Collections</span>
+<span class="cs">  Mock responses from spec examples</span></div>
+          <div class="example-result">✓ Supports OpenAPI 3.x and Swagger 2.x (JSON + YAML)</div>
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">
+          <span class="example-num">06</span>
+          <div>
+            <div class="example-title">Verify signed requests (HMAC)</div>
+            <div class="example-situation">An internal service calls your endpoint and you need to verify every request hasn't been tampered with.</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="code-block">
+<span class="cc"># Security → HMAC Signing tab</span>
+<span class="ck">Algorithm:</span> <span class="cv">HMAC-SHA256</span>
+<span class="ck">Header:</span>    <span class="cv">X-Signature</span>
+<span class="ck">Secret:</span>    <span class="cv">(click Generate)</span>
+
+<span class="cc"># Client signs the request:</span>
+<span class="cs">payload</span> = METHOD + \n + PATH
+         + \n + JSON(query)
+         + \n + JSON(body)
+<span class="cs">sig</span> = HMAC(<span class="cv">'sha256'</span>, secret, payload)
+headers[<span class="cv">'X-Signature'</span>] = sig</div>
+          <div class="example-result">✓ Invalid signature → 401 HMAC_INVALID · Timing-safe comparison</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install">
+  <div class="section-inner">
+    <div class="section-label">Installation</div>
+    <h2 class="section-title">Up in under 2 minutes.</h2>
+    <p class="section-sub">No Docker required for local development. MongoDB Atlas free tier works perfectly.</p>
+
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="install-step-num">1</div>
+        <div class="install-step-content">
+          <div class="install-step-title">Prerequisites</div>
+          <pre><span class="cmt"># Node.js 18+ and npm</span>
+<span class="cmd">node</span> --version   <span class="cmt"># must be v18 or higher</span>
+<span class="cmd">npm</span> --version
+
+<span class="cmt"># MongoDB 6+ (local) — OR use MongoDB Atlas free tier</span>
+<span class="cmt"># Atlas: https://www.mongodb.com/atlas (free, no credit card)</span></pre>
+        </div>
+      </div>
+
+      <div class="install-step">
+        <div class="install-step-num">2</div>
+        <div class="install-step-content">
+          <div class="install-step-title">Clone and install dependencies</div>
+          <pre><span class="cmd">git clone</span> https://github.com/your-username/relay-api-platform.git
+<span class="cmd">cd</span> relay-api-platform
+<span class="cmd">npm install</span></pre>
+        </div>
+      </div>
+
+      <div class="install-step">
+        <div class="install-step-num">3</div>
+        <div class="install-step-content">
+          <div class="install-step-title">Create your .env file</div>
+          <pre><span class="cmd">cp</span> .env.example .env
+<span class="cmt"># Edit .env with your values:</span>
+
+<span class="key">MONGODB_URI</span>=<span class="val">mongodb://localhost:27017/relay</span>
+<span class="key">PORT</span>=<span class="val">3000</span>
+<span class="key">SECRET_ENCRYPTION_KEY</span>=<span class="val">$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")</span>
+
+<span class="cmt"># For Atlas, replace MONGODB_URI with:</span>
+<span class="key">MONGODB_URI</span>=<span class="val">mongodb+srv://user:pass@cluster.mongodb.net/relay</span></pre>
+        </div>
+      </div>
+
+      <div class="install-step">
+        <div class="install-step-num">4</div>
+        <div class="install-step-content">
+          <div class="install-step-title">Start the server</div>
+          <pre><span class="cmt"># Development (hot-reload on file changes)</span>
+<span class="cmd">npm run start:dev</span>
+
+<span class="cmt"># Production</span>
+<span class="cmd">npm run build</span>
+<span class="cmd">npm run start:prod</span>
+
+<span class="cmt"># Open the dashboard</span>
+<span class="val">http://localhost:3000</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API REFERENCE -->
+<section id="api" style="background:var(--bg2)">
+  <div class="section-inner">
+    <div class="section-label">API Reference</div>
+    <h2 class="section-title">Full REST API.</h2>
+    <p class="section-sub">All endpoints accept and return JSON. Base URL: <code style="font-family:var(--mono);color:var(--a)">http://localhost:3000</code></p>
+
+    <div class="api-section">
+      <div class="api-section-title">Proxy Engine</div>
+      <table class="api-table">
+        <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        <tr><td><span class="method m-any">ANY</span></td><td class="path-cell">/api/:path</td><td>Dynamic proxy — matches configured endpoint by method + path</td></tr>
+      </table>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Endpoints</div>
+      <table class="api-table">
+        <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/endpoints</td><td>List all (filter: <code style="font-family:var(--mono)">?enabled=true&amp;collection=foo</code>)</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/endpoints</td><td>Create new endpoint</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/endpoints/stats</td><td>Aggregate stats (total, enabled, mocked, secured, collections)</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/endpoints/collections</td><td>Unique collection names with endpoint counts</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/endpoints/:id</td><td>Get one endpoint by ID</td></tr>
+        <tr><td><span class="method m-put">PUT</span></td><td class="path-cell">/catalog/endpoints/:id</td><td>Update endpoint (including securityConfig)</td></tr>
+        <tr><td><span class="method m-delete">DELETE</span></td><td class="path-cell">/catalog/endpoints/:id</td><td>Delete endpoint</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/endpoints/:id/generate-key</td><td>Regenerate API key</td></tr>
+        <tr><td><span class="method m-put">PUT</span></td><td class="path-cell">/catalog/endpoints/bulk/collection</td><td>Move multiple endpoints to a collection</td></tr>
+      </table>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Environments</div>
+      <table class="api-table">
+        <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/environments</td><td>List all environments</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/environments</td><td>Create environment with variables array</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/environments/active</td><td>Get the currently active environment</td></tr>
+        <tr><td><span class="method m-put">PUT</span></td><td class="path-cell">/catalog/environments/:id</td><td>Update name, description, color, variables</td></tr>
+        <tr><td><span class="method m-delete">DELETE</span></td><td class="path-cell">/catalog/environments/:id</td><td>Delete environment</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/environments/:id/activate</td><td>Set as active (deactivates all others)</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/environments/deactivate-all</td><td>Disable all environments</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/environments/preview</td><td>Preview [[VAR]] resolution without state change</td></tr>
+      </table>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Security</div>
+      <table class="api-table">
+        <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/security/events</td><td>Recent security events (last 100, 7-day TTL)</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/security/events/endpoint/:id</td><td>Security events for one endpoint</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/security/stats</td><td>24h summary: counts by type, top offending IPs</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td class="path-cell">/catalog/security/rate-limits/:id</td><td>Active rate-limit counters for an endpoint</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/security/unblock</td><td>Unblock an IP or fingerprint identifier</td></tr>
+        <tr><td><span class="method m-delete">DELETE</span></td><td class="path-cell">/catalog/security/rate-limits/:id</td><td>Clear all RL counters for endpoint</td></tr>
+      </table>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Import</div>
+      <table class="api-table">
+        <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        <tr><td><span class="method m-post">POST</span></td><td class="path-cell">/catalog/import/openapi</td><td>Import from OpenAPI 3.x or Swagger 2.x — body: <code style="font-family:var(--mono)">{ spec: object }</code> or <code style="font-family:var(--mono)">{ yaml: string }</code></td></tr>
+      </table>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Environment Variables</div>
+      <table class="env-table">
+        <tr><th>Variable</th><th>Required</th><th>Default</th><th>Description</th></tr>
+        <tr>
+          <td><code>MONGODB_URI</code></td>
+          <td class="req-yes">✅ Yes</td>
+          <td><code>mongodb://localhost:27017/relay</code></td>
+          <td>MongoDB connection string (local or Atlas)</td>
+        </tr>
+        <tr>
+          <td><code>PORT</code></td>
+          <td style="color:var(--t3)">No</td>
+          <td><code>3000</code></td>
+          <td>HTTP server port</td>
+        </tr>
+        <tr>
+          <td><code>SECRET_ENCRYPTION_KEY</code></td>
+          <td class="req-yes">✅ Yes*</td>
+          <td>—</td>
+          <td>64-char hex key for AES-256-GCM secrets encryption. Generate: <code>node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"</code></td>
+        </tr>
+      </table>
+      <p style="font-size:.75rem;color:var(--t3)">* Required only if you use the Secrets Vault feature.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Re<em>lay</em></div>
+    <div class="footer-sub">Self-hosted API Gateway Platform · MIT License</div>
+    <div class="footer-links">
+      <a href="https://github.com/your-username/relay-api-platform">GitHub</a>
+      <a href="https://github.com/your-username/relay-api-platform/issues">Issues</a>
+      <a href="https://github.com/your-username/relay-api-platform/blob/main/README.md">README</a>
+      <a href="#install">Install</a>
+      <a href="#api">API Docs</a>
+      <a href="#examples">Examples</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+// Animate elements on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feat-card, .example-card, .pipeline-step, .install-step').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity .4s ease, transform .4s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

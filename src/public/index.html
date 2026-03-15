@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Relay — API Gateway Platform</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080c12;--card:#0e141d;--surf:#141c27;--raised:#1b2436;
+  --border:#1e2a3a;--bsoft:#18232f;
+  --a:#00f5a8;--adim:rgba(0,245,168,.1);--aglow:rgba(0,245,168,.3);
+  --blue:#4da6ff;--bdim:rgba(77,166,255,.12);
+  --purple:#a97dff;--pdim:rgba(169,125,255,.12);
+  --warn:#ffbc42;--wdim:rgba(255,188,66,.12);
+  --danger:#ff5757;--ddim:rgba(255,87,87,.12);
+  --ok:#00d98b;--okdim:rgba(0,217,139,.12);
+  --teal:#00d9f5;--tdim:rgba(0,217,245,.12);
+  --t1:#e8edf5;--t2:#7d8fa6;--t3:#384860;
+  --mono:'JetBrains Mono',monospace;--ui:'Space Grotesk',sans-serif;
+  --r:10px;--rsm:6px;--rxs:4px;
+  --nav:56px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:var(--ui);font-size:14px;line-height:1.5;min-height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* NAV */
+nav{background:var(--card)!important;border-bottom:1px solid var(--border);height:var(--nav)!important;line-height:var(--nav)!important;box-shadow:none!important;position:sticky;top:0;z-index:200;transition:background .3s}
+.nav-w{max-width:1600px;margin:0 auto;padding:0 20px;display:flex;align-items:center;height:var(--nav);gap:10px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--a) 0%,var(--blue) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px var(--aglow)}
+.logo-mark svg{width:17px;height:17px}
+.logo-name{font-size:1.05rem;font-weight:700;color:var(--t1);letter-spacing:-.025em}
+.logo-name em{font-style:normal;color:var(--a)}
+.logo-tag{font-size:.55rem;color:var(--t3);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-left:2px;vertical-align:text-top}
+.tabs-bar{display:flex;align-items:center;gap:1px;margin-left:20px;flex:1;overflow-x:auto;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.ntab{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:var(--rsm);font-size:.76rem;font-weight:500;color:var(--t3);cursor:pointer;transition:.15s;white-space:nowrap;text-decoration:none;border:none;background:none;font-family:var(--ui)}
+.ntab:hover{color:var(--t1);background:var(--surf)}
+.ntab.on{color:var(--a);background:var(--adim)}
+.ntab .material-icons{font-size:15px}
+.nav-end{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.tswatch{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s;flex-shrink:0}
+.tswatch:hover,.tswatch.on{border-color:var(--a);transform:scale(1.2)}
+
+/* LAYOUT */
+.pw{max-width:1600px;margin:0 auto;padding:20px 20px 60px}
+.page{display:none}.page.on{display:block}
+
+/* TYPE */
+.ph{font-size:1rem;font-weight:700;letter-spacing:-.02em}
+.ph span{color:var(--a)}
+.psub{font-size:.72rem;color:var(--t3);margin-top:2px}
+.slabel{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3)}
+
+/* BUTTONS */
+.btn-p{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:var(--a);color:#080c12;font-weight:700;font-size:.74rem;border-radius:var(--rsm);border:none;cursor:pointer;transition:.15s;font-family:var(--ui);letter-spacing:.01em;box-shadow:0 2px 14px var(--aglow)}
+.btn-p:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-g{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;background:transparent;color:var(--t2);font-weight:500;font-size:.74rem;border-radius:var(--rsm);border:1px solid var(--border);cursor:pointer;transition:.15s;font-family:var(--ui)}
+.btn-g:hover{color:var(--t1);border-color:var(--a);background:var(--adim)}
+.btn-d{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:transparent;color:var(--danger);font-weight:500;font-size:.74rem;border-radius:var(--rsm);border:1px solid rgba(255,87,87,.25);cursor:pointer;transition:.15s;font-family:var(--ui)}
+.btn-d:hover{background:var(--ddim)}
+.btn-w{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--warn);color:#080c12;font-weight:700;font-size:.74rem;border-radius:var(--rsm);border:none;cursor:pointer;font-family:var(--ui)}
+.btn-sm{padding:4px 10px!important;font-size:.68rem!important}
+.btn-i{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--rsm);border:1px solid var(--border);background:transparent;color:var(--t3);cursor:pointer;transition:.15s}
+.btn-i:hover{color:var(--a);border-color:var(--a);background:var(--adim)}
+.btn-i .material-icons{font-size:15px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);transition:background .3s}
+.cp{padding:18px}
+
+/* KPI */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:15px 16px;position:relative;overflow:hidden;transition:border-color .2s,background .3s;cursor:default}
+.kpi:hover{border-color:var(--a)}
+.kbar{position:absolute;top:0;left:0;right:0;height:2px}
+.kico{position:absolute;top:13px;right:13px;font-size:1.3rem;opacity:.07}
+.kval{font-family:var(--mono);font-size:1.65rem;font-weight:700;line-height:1;margin-bottom:4px}
+.klbl{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--t3)}
+.kdelta{display:inline-flex;align-items:center;gap:3px;font-size:.62rem;font-weight:600;margin-top:5px;padding:1px 5px;border-radius:3px}
+.kdelta.up{background:var(--okdim);color:var(--ok)}
+.kdelta.dn{background:var(--ddim);color:var(--danger)}
+.kdelta.neu{background:var(--surf);color:var(--t3)}
+
+/* TABLE */
+.tw{border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead tr{background:var(--surf)}
+.tbl thead th{padding:8px 13px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);text-align:left;white-space:nowrap}
+.tbl tbody tr{border-top:1px solid var(--bsoft);transition:background .1s}
+.tbl tbody tr:hover{background:var(--surf)}
+.tbl tbody td{padding:9px 13px;vertical-align:middle;font-size:.79rem}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:var(--rxs);font-size:.6rem;font-weight:700;font-family:var(--mono)}
+.bGET{background:var(--adim);color:var(--a)}
+.bPOST{background:var(--pdim);color:var(--purple)}
+.bPUT{background:var(--wdim);color:var(--warn)}
+.bPATCH{background:var(--bdim);color:var(--blue)}
+.bDELETE{background:var(--ddim);color:var(--danger)}
+.bproxy{background:var(--bdim);color:var(--blue)}
+.bmock{background:var(--wdim);color:var(--warn)}
+.bkey{background:var(--wdim);color:var(--warn)}
+.bcache{background:var(--tdim);color:var(--teal)}
+.bfile{background:var(--okdim);color:var(--ok)}
+
+/* PATH */
+.epath{font-family:var(--mono);font-size:.74rem;color:var(--a)}
+.epath .pre{color:var(--t3)}
+
+/* DOTS */
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.don{background:var(--a)}.doff{background:var(--t3)}
+.dlive{background:var(--a);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* FORM */
+.input-field label{color:var(--t3)!important;font-size:.75rem;font-family:var(--ui)!important}
+.input-field input,.input-field textarea,.input-field select{color:var(--t1)!important;background:var(--surf)!important;border-bottom-color:var(--border)!important;font-family:var(--ui)!important}
+.input-field input:focus,.input-field textarea:focus{border-bottom-color:var(--a)!important;box-shadow:0 1px 0 0 var(--a)!important}
+.input-field input:focus+label,.input-field textarea:focus+label{color:var(--a)!important}
+select,select option{color:var(--t1)!important;background:var(--surf)!important}
+.select-wrapper input.select-dropdown{color:var(--t1)!important;font-family:var(--ui)!important}
+.dropdown-content{background:var(--surf)!important;border:1px solid var(--border)!important;border-radius:var(--rsm)!important}
+.dropdown-content li>a,.dropdown-content li>span{color:var(--t1)!important;font-family:var(--ui)!important}
+.dropdown-content li:hover{background:var(--adim)!important}
+textarea.materialize-textarea{font-family:var(--mono)!important;font-size:.74rem}
+.fsep{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);margin:13px 0 7px;display:flex;align-items:center;gap:7px}
+.fsep::after{content:'';flex:1;height:1px;background:var(--border)}
+.prow{display:grid;grid-template-columns:1fr 90px 60px auto;gap:5px;align-items:end;padding:5px 8px;background:var(--surf);border:1px solid var(--border);border-radius:var(--rsm);margin-bottom:4px}
+.prow input,.prow select{background:transparent!important;border:none!important;border-bottom:1px solid var(--border)!important;border-radius:0!important;color:var(--t1)!important;font-size:.73rem;height:24px;padding:0 2px!important;margin:0!important}
+.rchk-lbl{display:flex;align-items:center;gap:3px;cursor:pointer}
+.rchk-lbl .rb{width:15px;height:15px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:transparent;transition:.15s}
+.rchk-lbl input:checked+.rb{background:var(--a);border-color:var(--a);color:#080c12}
+.rchk-lbl input{display:none}
+.rchk-lbl .rl{font-size:.58rem;color:var(--t3)}
+.addrow{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--a);cursor:pointer;padding:3px 0;border:none;background:none;font-family:var(--ui)}
+.addrow:hover{opacity:.7}
+.rmb{background:none;border:none;cursor:pointer;color:var(--t3);line-height:1;padding:0 2px;transition:color .15s}
+.rmb:hover{color:var(--danger)}
+.code-a{background:var(--bg);color:var(--a);font-family:var(--mono);font-size:.72rem;line-height:1.6;border:1px solid var(--border);width:100%;resize:vertical;min-height:80px;padding:8px 10px;border-radius:var(--rsm);outline:none;transition:border-color .15s}
+.code-a:focus{border-color:var(--a)}
+
+/* INNER TABS */
+.itabs{display:flex;gap:2px;background:var(--surf);border-radius:var(--rsm);padding:3px;margin-bottom:13px;flex-wrap:wrap}
+.itab{flex:1;min-width:50px;text-align:center;padding:4px 7px;font-size:.63rem;font-weight:600;color:var(--t3);border-radius:var(--rxs);cursor:pointer;transition:.15s;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.itab.on{background:var(--card);color:var(--a)}
+
+/* EVENT PILLS */
+.epills{display:flex;flex-wrap:wrap;gap:4px;min-height:32px;padding:5px 7px;background:var(--surf);border:1px solid var(--border);border-radius:var(--rsm)}
+.epill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:12px;font-size:.63rem;font-weight:600}
+.epill.pre{background:var(--adim);color:var(--a)}
+.epill.post{background:var(--pdim);color:var(--purple)}
+.epill .rm{font-size:.65rem;opacity:.6;cursor:pointer}.epill .rm:hover{opacity:1}
+
+/* MODAL */
+.modal{background:var(--card)!important;border:1px solid var(--border);border-radius:14px!important;color:var(--t1)!important;max-height:92vh!important;box-shadow:0 20px 80px rgba(0,0,0,.7)!important;transition:background .3s}
+.mhdr{padding:17px 20px 0;border-bottom:1px solid var(--border)}
+.mhdr h5{font-size:.88rem;font-weight:700;padding-bottom:13px}
+.modal .modal-content{padding:16px 20px}
+.modal .modal-footer{background:var(--surf)!important;border-top:1px solid var(--border);padding:10px 16px;border-radius:0 0 14px 14px!important}
+.kbox{background:var(--bg);border:1px solid rgba(255,188,66,.2);border-radius:var(--rsm);padding:13px}
+.kv{font-family:var(--mono);font-size:.74rem;color:var(--warn);word-break:break-all;margin:6px 0}
+.cbox{background:var(--tdim);border:1px solid rgba(0,217,245,.18);border-radius:var(--rsm);padding:11px;font-size:.72rem;color:var(--t2);line-height:1.7;margin-top:10px}
+.cbox code{color:var(--teal);font-family:var(--mono);font-size:.68rem}
+.fbox{background:var(--okdim);border:1px solid rgba(0,217,139,.18);border-radius:var(--rsm);padding:11px;margin-top:10px}
+.curlbox{background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);padding:11px}
+.curlcode{font-family:var(--mono);font-size:.68rem;color:var(--a);white-space:pre-wrap;word-break:break-all;line-height:1.65}
+
+/* NSEL */
+.nsel{background:var(--card)!important;color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 9px;font-size:.71rem;font-family:var(--ui);cursor:pointer;outline:none;transition:.15s}
+.nsel:hover,.nsel:focus{border-color:var(--a);color:var(--t1)}
+
+/* HISTORY */
+.logtb{background:var(--surf);border-bottom:1px solid var(--border);padding:8px 13px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.loghdr{display:grid;grid-template-columns:18px 122px 50px 46px 54px 46px 64px 1fr 20px;gap:4px;padding:5px 11px;background:var(--surf);border-bottom:1px solid var(--border)}
+.loghdr span{font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)}
+.loglist{max-height:480px;overflow-y:auto;font-family:var(--mono);font-size:.68rem}
+.logrow{display:grid;grid-template-columns:18px 122px 50px 46px 54px 46px 64px 1fr 20px;gap:4px;align-items:center;padding:5px 11px;border-bottom:1px solid rgba(30,42,58,.5);cursor:pointer;transition:background .1s}
+.logrow:hover{background:var(--surf)}
+.logrow.lerr{border-left:2px solid var(--danger)}
+.dfast{color:var(--a)}.dmid{color:var(--warn)}.dslow{color:var(--danger)}
+.rck{width:12px;height:12px;accent-color:var(--a);cursor:pointer}
+
+/* DASHBOARD */
+.drow{display:grid;gap:13px;margin-bottom:13px}
+.d1{grid-template-columns:1fr}
+.d2{grid-template-columns:1fr 1fr}
+.d3{grid-template-columns:1fr 1fr 1fr}
+.d4{grid-template-columns:repeat(4,1fr)}
+.d21{grid-template-columns:2fr 1fr}
+.d12{grid-template-columns:1fr 2fr}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:background .3s;position:relative;overflow:hidden}
+.cctitle{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);margin-bottom:13px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ccbadge{font-size:.58rem;padding:1px 6px;border-radius:3px;background:var(--surf);color:var(--t2);text-transform:none;letter-spacing:0;font-weight:500;flex-shrink:0}
+.chartw{position:relative}
+
+/* PERF TABLE */
+.ptbl{width:100%;border-collapse:collapse;font-size:.74rem}
+.ptbl thead th{padding:7px 10px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);text-align:left;border-bottom:1px solid var(--border)}
+.ptbl tbody tr{border-bottom:1px solid var(--bsoft);cursor:pointer;transition:background .1s}
+.ptbl tbody tr:hover{background:var(--surf)}
+.ptbl tbody td{padding:8px 10px;vertical-align:middle}
+.bartrack{background:var(--surf);border-radius:2px;height:4px;overflow:hidden;margin-top:2px}
+.barfill{height:4px;border-radius:2px;transition:width .5s}
+.health{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:10px;font-size:.6rem;font-weight:700}
+.hgood{background:var(--okdim);color:var(--ok)}
+.hwarn{background:var(--wdim);color:var(--warn)}
+.hbad{background:var(--ddim);color:var(--danger)}
+
+/* DRILL */
+.drillp{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-top:13px;overflow:hidden}
+.drillhdr{background:var(--surf);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:7px}
+.tlovrl{position:absolute;top:10px;right:12px;display:flex;gap:10px;pointer-events:none}
+.tlovrl-i{text-align:right}
+.tlovrl-v{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--t1)}
+.tlovrl-l{font-size:.56rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--t3)}
+.empty .material-icons{font-size:2rem;opacity:.25;margin-bottom:7px;display:block}
+.empty p{font-size:.78rem}
+
+/* SCRIPT HINT */
+.shint{font-size:.63rem;color:var(--t3);line-height:1.6;margin-top:5px}
+.shint code{color:var(--a);font-family:var(--mono);font-size:.64rem}
+
+/* TOAST */
+#toast-container .toast{background:var(--surf)!important;border:1px solid var(--border);border-left:3px solid var(--a);color:var(--t1)!important;border-radius:var(--rsm);font-family:var(--ui)!important;font-size:.8rem}
+#toast-container .toast.terr{border-left-color:var(--danger)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .d3{grid-template-columns:1fr 1fr}
+  .d4{grid-template-columns:repeat(2,1fr)}
+  .d21,.d12{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .d2,.d3,.d4,.d21,.d12{grid-template-columns:1fr}
+  .kgrid{grid-template-columns:repeat(2,1fr)}
+  .loghdr,.logrow{grid-template-columns:18px 1fr 46px 54px 64px 20px}
+  .loghdr span:nth-child(3),.loghdr span:nth-child(5),
+  .logrow>*:nth-child(3),.logrow>*:nth-child(5){display:none}
+  .tabs-bar{gap:0}
+  .ntab{padding:5px 8px;font-size:.71rem}
+}
+@media(max-width:540px){
+  .pw{padding:12px 12px 40px}
+  .nav-w{padding:0 12px}
+  .kgrid{grid-template-columns:repeat(2,1fr)}
+  .ntab span:not(.material-icons){display:none}
+  .ntab{padding:5px 7px}
+  .logo-tag{display:none}
+}
+
+/* SECRETS */
+.stype-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:.6rem;font-weight:700;font-family:var(--mono)}
+.st-api_key{background:var(--wdim);color:var(--warn)}
+.st-token{background:var(--bdim);color:var(--blue)}
+.st-password{background:var(--ddim);color:var(--danger)}
+.st-oauth_secret{background:var(--pdim);color:var(--purple)}
+.st-certificate{background:var(--okdim);color:var(--ok)}
+.st-other{background:var(--surf);color:var(--t3)}
+.masked{font-family:var(--mono);font-size:.82rem;color:var(--t3);letter-spacing:.12em}
+.sec-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:0;overflow:hidden;transition:border-color .2s}
+.sec-card:hover{border-color:var(--a)}
+.sec-hdr{padding:13px 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--border)}
+.sec-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-meta{flex:1;min-width:0}
+.sec-name{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--a)}
+.sec-desc{font-size:.64rem;color:var(--t3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec-body{padding:11px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--surf)}
+.sec-stat{font-size:.6rem;color:var(--t3);display:flex;align-items:center;gap:3px}
+.ref-chip{display:inline-flex;align-items:center;gap:3px;background:var(--adim);border:1px solid rgba(0,245,168,.15);padding:1px 6px;border-radius:10px;font-size:.58rem;color:var(--a);font-family:var(--mono)}
+.usage-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;width:60px}
+.usage-fill{height:3px;background:var(--a);border-radius:2px;transition:width .4s}
+.snippet-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);padding:13px 14px;font-family:var(--mono);font-size:.69rem;color:var(--a);line-height:1.7;white-space:pre;overflow-x:auto}
+.snippet-box .cm{color:var(--t3)}
+.snippet-box .kw{color:var(--purple)}
+.snippet-box .str{color:var(--ok)}
+.snippet-box .fn{color:var(--blue)}
+.snippet-box .sc{color:var(--warn)}
+.enc-badge{display:inline-flex;align-items:center;gap:4px;background:var(--okdim);border:1px solid rgba(0,217,139,.2);padding:3px 8px;border-radius:12px;font-size:.62rem;color:var(--ok);font-weight:600}
+.warn-box{background:var(--wdim);border:1px solid rgba(255,188,66,.2);border-radius:var(--rsm);padding:10px 13px;font-size:.72rem;color:var(--warn);display:flex;align-items:flex-start;gap:8px;line-height:1.55}
+
+/* COLLECTIONS */
+.col-group{margin-bottom:13px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.col-hdr{display:flex;align-items:center;gap:9px;padding:9px 14px;background:var(--surf);cursor:pointer;user-select:none;transition:background .15s}
+.col-hdr:hover{background:var(--raised)}
+.col-hdr .col-arrow{font-size:13px;color:var(--t3);transition:transform .2s;flex-shrink:0}
+.col-hdr.open .col-arrow{transform:rotate(90deg)}
+.col-badge{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 5px;background:var(--adim);border-radius:10px;font-size:.62rem;font-weight:700;color:var(--a);font-family:var(--mono)}
+.col-actions{margin-left:auto;display:flex;gap:3px;opacity:0;transition:opacity .15s}
+.col-hdr:hover .col-actions{opacity:1}
+.col-body{display:none}
+.col-body.open{display:block}
+/* Export menu */
+.emenu-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px 14px;background:none;border:none;color:var(--t1);font-size:.73rem;font-family:var(--ui);cursor:pointer;transition:background .1s;text-align:left}
+.emenu-item:hover{background:var(--surf)}
+/* Code gen modal */
+.lang-tab{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--rsm);font-size:.7rem;font-weight:600;cursor:pointer;border:1px solid transparent;transition:.15s;font-family:var(--ui);color:var(--t3);background:none}
+.lang-tab:hover{color:var(--t1);background:var(--surf)}
+.lang-tab.on{color:var(--a);background:var(--adim);border-color:rgba(0,245,168,.2)}
+.code-out{background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);padding:14px;font-family:var(--mono);font-size:.7rem;line-height:1.75;overflow-x:auto;white-space:pre;min-height:180px;max-height:52vh;overflow-y:auto;color:var(--t1)}
+/* History panel */
+.th-entry{padding:9px 13px;border-bottom:1px solid var(--bsoft);cursor:pointer;transition:background .1s}
+.th-entry:hover{background:var(--surf)}
+.th-entry.active{background:var(--adim);border-left:2px solid var(--a)}
+.th-method{display:inline-block;width:44px;font-size:.6rem;font-weight:700;font-family:var(--mono);text-align:center;padding:1px 3px;border-radius:3px}
+.th-status{font-family:var(--mono);font-size:.65rem;font-weight:700}
+.th-path{font-size:.65rem;color:var(--t2);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.th-time{font-size:.58rem;color:var(--t3)}
+/* Tester responsive */
+@media(max-width:1100px){#tester-grid{grid-template-columns:220px 1fr 1fr}}
+@media(max-width:860px){#tester-grid{grid-template-columns:1fr 1fr}#tester-grid>:first-child{grid-column:1/-1;max-height:160px}}
+@media(max-width:600px){#tester-grid{grid-template-columns:1fr}}
+
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* SECURITY MODULE */
+.sec-threat-card{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--surf);border:1px solid var(--border);border-radius:var(--rsm)}
+.sec-threat-card .material-icons{font-size:20px;flex-shrink:0}
+.sp{} /* security sub-panel */
+.sec-evt-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bsoft);font-size:.67rem}
+.sec-evt-type{display:inline-flex;align-items:center;padding:1px 6px;border-radius:3px;font-size:.59rem;font-weight:700;font-family:var(--mono);white-space:nowrap}
+.set-rate_limit_exceeded{background:var(--wdim);color:var(--warn)}
+.set-ip_blocked{background:var(--ddim);color:var(--danger)}
+.set-ip_not_allowed{background:var(--ddim);color:var(--danger)}
+.set-threat_detected{background:var(--ddim);color:var(--danger)}
+.set-fingerprint_blocked{background:var(--pdim);color:var(--purple)}
+.set-hmac_invalid{background:var(--bdim);color:var(--blue)}
+.set-body_too_large{background:var(--wdim);color:var(--warn)}
+.set-cors_rejected{background:var(--bdim);color:var(--blue)}
+.set-suspicious_pattern{background:var(--ddim);color:var(--danger)}
+
+/* ENVIRONMENTS */
+.env-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:0;overflow:hidden;cursor:pointer;transition:.15s}
+.env-card:hover{border-color:var(--a);transform:translateY(-1px)}
+.env-card.active-env{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok)}
+.env-card-bar{height:3px}
+.env-card-body{padding:13px 16px}
+.env-var-row{display:grid;grid-template-columns:1fr 1fr auto;gap:7px;align-items:center;margin-bottom:7px}
+.env-var-row input{background:var(--surf);color:var(--t1);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 9px;font-family:var(--mono);font-size:.7rem;outline:none;width:100%}
+.env-var-row input:focus{border-color:var(--a)}
+.env-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px;margin-bottom:20px}
+.var-ref-badge{display:inline-flex;align-items:center;gap:4px;background:var(--adim);color:var(--a);border-radius:3px;padding:1px 6px;font-family:var(--mono);font-size:.61rem;cursor:pointer}
+.var-ref-badge:hover{background:var(--a);color:#fff}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-w">
+    <a class="logo" href="#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 17 17" fill="none">
+          <path d="M2 9l3-5 3 8 3-8 3 5" stroke="#080c12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="logo-name">Re<em>lay</em><span class="logo-tag">API Platform</span></span>
+    </a>
+    <div class="tabs-bar">
+      <a href="#" class="ntab on" data-target="pg-endpoints"><i class="material-icons">hub</i><span>Endpoints</span></a>
+      <a href="#" class="ntab" data-target="pg-events"><i class="material-icons">bolt</i><span>Events</span></a>
+      <a href="#" class="ntab" data-target="pg-dashboard"><i class="material-icons">dashboard</i><span>Dashboard</span></a>
+      <a href="#" class="ntab" data-target="pg-history"><i class="material-icons">history</i><span>History</span></a>
+      <a href="#" class="ntab" data-target="pg-secrets"><i class="material-icons">lock</i><span>Secrets</span></a>
+      <a href="#" class="ntab" data-target="pg-tester"><i class="material-icons">science</i><span>Test</span></a>
+      <a href="#" class="ntab" data-target="pg-security"><i class="material-icons">shield</i><span>Security</span></a>
+      <a href="#" class="ntab" data-target="pg-environments"><i class="material-icons">layers</i><span>Environments</span></a>
+    </div>
+    <div class="nav-end">
+      <div style="display:flex;align-items:center;gap:6px;margin-right:8px;padding-right:9px;border-right:1px solid var(--border)">
+        <i class="material-icons" style="font-size:13px;color:var(--t3)">layers</i>
+        <select id="nav-env-sel" onchange="switchActiveEnv(this.value)"
+          style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:3px 7px;font-size:.67rem;font-family:var(--ui);max-width:130px;cursor:pointer"
+          title="Active environment">
+          <option value="">No environment</option>
+        </select>
+      </div>
+      <span style="font-size:.58rem;color:var(--t3)">Theme</span>
+      <div class="tswatch on"  data-t="dark"      style="background:#080c12" onclick="setTheme('dark')"      title="Dark"></div>
+      <div class="tswatch"     data-t="light"     style="background:#f0f3f8" onclick="setTheme('light')"     title="Light"></div>
+      <div class="tswatch"     data-t="midnight"  style="background:#050310" onclick="setTheme('midnight')"  title="Midnight"></div>
+      <div class="tswatch"     data-t="forest"    style="background:#030c04" onclick="setTheme('forest')"    title="Forest"></div>
+      <div class="tswatch"     data-t="solarized" style="background:#002b36" onclick="setTheme('solarized')" title="Solarized"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="pw">
+
+<!-- ENDPOINTS -->
+<div id="pg-endpoints" class="page on">
+  <div class="kgrid">
+    <div class="kpi"><div class="kbar" style="background:var(--a)"></div><i class="material-icons kico">hub</i><div class="kval" id="s-total">—</div><div class="klbl">Total</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--ok)"></div><i class="material-icons kico">check_circle</i><div class="kval" id="s-active">—</div><div class="klbl">Active</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><i class="material-icons kico">swap_horiz</i><div class="kval" id="s-proxy">—</div><div class="klbl">Proxy</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--warn)"></div><i class="material-icons kico">science</i><div class="kval" id="s-mock">—</div><div class="klbl">Mock</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--danger)"></div><i class="material-icons kico">vpn_key</i><div class="kval" id="s-secured">—</div><div class="klbl">Secured</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--purple)"></div><i class="material-icons kico">folder</i><div class="kval" id="s-collections">—</div><div class="klbl">Collections</div></div>
+  </div>
+  <!-- toolbar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">
+    <div><div class="ph"><span>/api</span>/* — Endpoint Registry</div><div class="psub">Manage virtual routes, proxies and mock responses</div></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <!-- collection filter -->
+      <div style="display:flex;align-items:center;gap:5px">
+        <select id="ep-col-filter" onchange="applyEpFilter()" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 8px;font-size:.7rem;font-family:var(--ui);cursor:pointer">
+          <option value="">All collections</option>
+        </select>
+      </div>
+      <!-- export dropdown -->
+      <div style="position:relative" id="export-menu-wrap">
+        <button class="btn-g" onclick="toggleExportMenu()" id="export-menu-btn">
+          <i class="material-icons" style="font-size:14px">download</i>Export
+          <i class="material-icons" style="font-size:11px">arrow_drop_down</i>
+        </button>
+        <div id="export-menu" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:500;min-width:210px;overflow:hidden">
+          <div style="padding:6px 12px;font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)">Export current view as…</div>
+          <button class="emenu-item" onclick="exportAs('postman')"><i class="material-icons" style="font-size:14px;color:var(--warn)">send</i>Postman Collection v2.1</button>
+          <button class="emenu-item" onclick="exportAs('insomnia')"><i class="material-icons" style="font-size:14px;color:var(--purple)">science</i>Insomnia v4 Export</button>
+          <button class="emenu-item" onclick="exportAs('openapi')"><i class="material-icons" style="font-size:14px;color:var(--blue)">description</i>OpenAPI 3.0 (YAML)</button>
+          <button class="emenu-item" onclick="exportAs('k6')"><i class="material-icons" style="font-size:14px;color:var(--ok)">speed</i>k6 Load Test Script</button>
+        </div>
+      </div>
+      <button class="btn-g" onclick="openCurlImport()"><i class="material-icons" style="font-size:14px">upload</i>Import cURL</button>
+      <button class="btn-p" onclick="openEpModal()"><i class="material-icons" style="font-size:14px">add</i>New Endpoint</button>
+    </div>
+  </div>
+  <!-- endpoint list grouped by collection -->
+  <div id="ep-collections-wrap"></div>
+</div>
+
+<!-- EVENTS -->
+<div id="pg-events" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">
+    <div><div class="ph"><span>/events</span> — Hook Registry</div><div class="psub">Pre & Post execution webhooks and JS scripts</div></div>
+    <button class="btn-p" onclick="openEvModal()"><i class="material-icons" style="font-size:14px">add</i>New Event</button>
+  </div>
+  <div class="tw card">
+    <table class="tbl"><thead><tr><th>Name</th><th>Type</th><th>Target / Script</th><th>Status</th><th></th></tr></thead>
+    <tbody id="ev-tbody"><tr><td colspan="5"><div class="empty"><i class="material-icons">bolt</i><p>Loading…</p></div></td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="pg-dashboard" class="page">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="ph"><span>Dashboard</span> — API Performance</div>
+      <div class="psub" style="display:flex;align-items:center;gap:7px">
+        Monitoring &amp; analytics <span class="dot dlive"></span>
+        <span id="dash-ts" style="font-size:.65rem;color:var(--t3)"></span>
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+      <select class="nsel" id="dash-range" onchange="loadDash()">
+        <option value="1h" selected>Last 1h</option>
+        <option value="3h">Last 3h</option>
+        <option value="24h">Last 24h</option>
+        <option value="all">All time</option>
+      </select>
+      <button class="btn-g btn-sm" onclick="loadDash()"><i class="material-icons" style="font-size:13px">refresh</i>Refresh</button>
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+    <div class="kpi"><div class="kbar" style="background:var(--a)"></div><i class="material-icons kico">receipt_long</i><div class="kval" id="dk-total">—</div><div class="klbl">Requests</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--ok)"></div><i class="material-icons kico">check_circle</i><div class="kval" id="dk-ok">—</div><div class="klbl">Success</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--danger)"></div><i class="material-icons kico">error</i><div class="kval" id="dk-err">—</div><div class="klbl">Errors</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><i class="material-icons kico">speed</i><div class="kval" id="dk-avg">—</div><div class="klbl">Avg Latency</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--purple)"></div><i class="material-icons kico">timer</i><div class="kval" id="dk-p95">—</div><div class="klbl">P95 Latency</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--warn)"></div><i class="material-icons kico">timer</i><div class="kval" id="dk-p99">—</div><div class="klbl">P99 Latency</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--teal)"></div><i class="material-icons kico">bolt</i><div class="kval" id="dk-cache">—</div><div class="klbl">Cache Hits</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--danger)"></div><i class="material-icons kico">percent</i><div class="kval" id="dk-errrate">—</div><div class="klbl">Error Rate</div></div>
+  </div>
+
+  <!-- Timeline full width -->
+  <div class="drow d1">
+    <div class="cc" style="padding:16px 16px 12px">
+      <div class="cctitle">Request Volume &amp; Response Time
+        <div class="tlovrl" id="tl-ovrl"></div>
+      </div>
+      <div class="chartw" style="height:210px"><canvas id="ch-tl"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Row 2: 3 charts -->
+  <div class="drow d3">
+    <div class="cc"><div class="cctitle">Calls by Endpoint</div><div class="chartw" style="height:195px"><canvas id="ch-byep"></canvas></div></div>
+    <div class="cc"><div class="cctitle">HTTP Status Distribution</div><div class="chartw" style="height:195px"><canvas id="ch-status"></canvas></div></div>
+    <div class="cc"><div class="cctitle">Success vs Error <span class="ccbadge" id="err-badge">—</span></div><div class="chartw" style="height:195px"><canvas id="ch-donut"></canvas></div></div>
+  </div>
+
+  <!-- Row 3: 2 charts -->
+  <div class="drow d21">
+    <div class="cc"><div class="cctitle">Avg Response Time by Endpoint (ms)</div><div class="chartw" style="height:175px"><canvas id="ch-avgms"></canvas></div></div>
+    <div class="cc"><div class="cctitle">Requests by Method</div><div class="chartw" style="height:175px"><canvas id="ch-method"></canvas></div></div>
+  </div>
+
+  <!-- Performance table -->
+  <div class="cc" style="margin-bottom:13px">
+    <div class="cctitle" style="margin-bottom:11px">Endpoint Performance <span class="ccbadge">click to drill down</span></div>
+    <div style="overflow-x:auto">
+      <table class="ptbl" id="perf-tbl">
+        <thead><tr><th>Endpoint</th><th>Method</th><th>Calls</th><th>Avg ms</th><th>Min</th><th>Max</th><th>Errors</th><th>Error %</th><th>Cache</th><th>Health</th></tr></thead>
+        <tbody id="perf-tbody"><tr><td colspan="10"><div class="empty" style="padding:24px"><i class="material-icons">bar_chart</i><p>No data yet</p></div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Drill-down -->
+  <div class="drillp" id="drill" style="display:none">
+    <div class="drillhdr">
+      <div><div style="font-size:.82rem;font-weight:700" id="drill-name">Detail</div><div style="font-size:.67rem;color:var(--t3)" id="drill-path"></div></div>
+      <div style="display:flex;gap:7px;align-items:center">
+        <select class="nsel" id="drill-range" onchange="loadDrill()">
+          <option value="1h" selected>Last 1h</option>
+          <option value="3h">Last 3h</option>
+          <option value="24h">Last 24h</option>
+        </select>
+        <button class="btn-i" onclick="closeDrill()"><i class="material-icons">close</i></button>
+      </div>
+    </div>
+    <div style="padding:14px">
+      <div class="kgrid" id="drill-kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));margin-bottom:13px"></div>
+      <div class="drow d2">
+        <div class="cc"><div class="cctitle">Response Time + Volume</div><div class="chartw" style="height:175px"><canvas id="ch-dtl"></canvas></div></div>
+        <div class="cc"><div class="cctitle">Success / Error</div><div class="chartw" style="height:175px"><canvas id="ch-dpie"></canvas></div></div>
+      </div>
+      <div id="drill-errs" style="margin-top:11px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="pg-history" class="page">
+  <div class="kgrid">
+    <div class="kpi"><div class="kbar" style="background:var(--a)"></div><div class="kval" id="hs-total">—</div><div class="klbl">Calls</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--ok)"></div><div class="kval" id="hs-ok">—</div><div class="klbl">Success</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--danger)"></div><div class="kval" id="hs-err">—</div><div class="klbl">Errors</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><div class="kval" id="hs-avg">—</div><div class="klbl">Avg ms</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--teal)"></div><div class="kval" id="hs-cache">—</div><div class="klbl">Cache Hits</div></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;flex-wrap:wrap;gap:7px">
+    <div class="ph"><span>/history</span> — Request Log &nbsp;<span class="dot dlive" id="live-dot"></span></div>
+    <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+      <select class="nsel" id="h-range" onchange="onHCtrl()"><option value="10m">10m</option><option value="30m">30m</option><option value="1h">1h</option><option value="3h">3h</option><option value="all" selected>All</option></select>
+      <select class="nsel" id="h-refresh" onchange="onHCtrl()"><option value="0" selected>No refresh</option><option value="5">Every 5s</option><option value="15">Every 15s</option><option value="30">Every 30s</option></select>
+      <select class="nsel" id="h-ep" onchange="loadHist(true)"><option value="">All endpoints</option></select>
+      <select class="nsel" id="h-st" onchange="loadHist(true)"><option value="">All status</option><option value="success">Success</option><option value="error">Error</option></select>
+      <button class="btn-i" onclick="loadHist(true)"><i class="material-icons">refresh</i></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="logtb">
+      <input type="checkbox" class="rck" id="sel-all" onchange="toggleSelAll()"/>
+      <span style="font-size:.6rem;color:var(--t3);font-family:var(--mono)"><span id="h-cnt">0</span> rows · <span id="h-sel">0</span> selected · <span id="h-ts">—</span></span>
+      <div style="margin-left:auto;display:flex;gap:5px">
+        <button class="btn-d btn-sm" id="btn-del-sel" style="display:none" onclick="delSelected()"><i class="material-icons" style="font-size:12px">delete</i>Delete sel.</button>
+        <button class="btn-d btn-sm" onclick="confDelAll()"><i class="material-icons" style="font-size:12px">delete_sweep</i>Clear all</button>
+      </div>
+    </div>
+    <div class="loghdr">
+      <span></span><span>Timestamp</span><span>Method</span><span>HTTP</span><span>Status</span><span>Mode</span><span>Duration</span><span>Endpoint</span><span></span>
+    </div>
+    <div class="loglist" id="hist-log"><div class="empty"><i class="material-icons">history</i><p>Open this tab to load history</p></div></div>
+  </div>
+</div>
+
+<!-- TESTER -->
+
+<!-- SECRETS PAGE -->
+<div id="pg-secrets" class="page">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="ph"><span>Secrets</span> — Vault</div>
+      <div class="psub">Encrypted storage for API keys, tokens and passwords · AES-256-GCM</div>
+    </div>
+    <button class="btn-p" onclick="openSecModal()"><i class="material-icons" style="font-size:14px">add</i>New Secret</button>
+  </div>
+
+  <!-- Encryption notice -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+    <span class="enc-badge"><i class="material-icons" style="font-size:13px">lock</i>AES-256-GCM encrypted at rest</span>
+    <span class="enc-badge" style="background:var(--bdim);border-color:rgba(77,166,255,.2);color:var(--blue)"><i class="material-icons" style="font-size:13px">visibility_off</i>Values never exposed after save</span>
+    <span class="enc-badge" style="background:var(--pdim);border-color:rgba(169,125,255,.2);color:var(--purple)"><i class="material-icons" style="font-size:13px">code</i>ctx.secrets.NAME in scripts</span>
+    <span class="enc-badge" style="background:var(--wdim);border-color:rgba(255,188,66,.2);color:var(--warn)"><i class="material-icons" style="font-size:13px">swap_horiz</i>{{SECRET_NAME}} in headers/URL</span>
+  </div>
+
+  <!-- How to use panel -->
+  <div class="cc" style="margin-bottom:18px">
+    <div class="cctitle" style="cursor:pointer;user-select:none" onclick="toggleHowTo()">
+      <span><i class="material-icons" style="font-size:14px;vertical-align:middle;margin-right:5px">help_outline</i>How to use secrets</span>
+      <span id="howto-arrow" style="font-size:.7rem;color:var(--t3)">▼ expand</span>
+    </div>
+    <div id="howto-body" style="display:none;margin-top:13px">
+      <div class="drow d2">
+
+        <div>
+          <div class="slabel" style="margin-bottom:8px">Method 1 — {{PLACEHOLDER}} in headers or destination URL</div>
+          <div class="snippet-box"><span class="cm">// Destination URL of an endpoint:</span>
+https://api.stripe.com/v1/charges
+
+<span class="cm">// Destination Headers:</span>
+Authorization: <span class="sc">Bearer {{STRIPE_SECRET_KEY}}</span>
+x-github-token: <span class="sc">{{GITHUB_TOKEN}}</span>
+x-tenant-id:    <span class="sc">{{TENANT_API_KEY}}</span>
+
+<span class="cm">// Relay resolves secrets BEFORE the outbound call.
+// Values are never logged or stored in executions.</span></div>
+        </div>
+
+        <div>
+          <div class="slabel" style="margin-bottom:8px">Method 2 — ctx.secrets in PRE script events</div>
+          <div class="snippet-box"><span class="cm">// PRE-event script — inject auth header dynamically:</span>
+<span class="kw">const</span> token = ctx.secrets.<span class="sc">GITHUB_TOKEN</span>;
+ctx.request.headers[<span class="str">'Authorization'</span>] = <span class="str">`Bearer ${token}`</span>;
+
+<span class="cm">// Use different secrets based on request body:</span>
+<span class="kw">const</span> env = ctx.request.body.env || <span class="str">'prod'</span>;
+<span class="kw">const</span> key = env === <span class="str">'prod'</span>
+  ? ctx.secrets.<span class="sc">PROD_API_KEY</span>
+  : ctx.secrets.<span class="sc">STAGING_API_KEY</span>;
+ctx.request.headers[<span class="str">'x-api-key'</span>] = key;
+
+<span class="cm">// Store timing in extras (POST-event will read it):</span>
+ctx.extras.requestId = <span class="fn">require</span>(<span class="str">'crypto'</span>).randomUUID();</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:18px">
+    <div class="kpi"><div class="kbar" style="background:var(--a)"></div><i class="material-icons kico">lock</i><div class="kval" id="sec-total">—</div><div class="klbl">Total Secrets</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--warn)"></div><i class="material-icons kico">vpn_key</i><div class="kval" id="sec-api">—</div><div class="klbl">API Keys</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><i class="material-icons kico">token</i><div class="kval" id="sec-tok">—</div><div class="klbl">Tokens</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--ok)"></div><i class="material-icons kico">bar_chart</i><div class="kval" id="sec-uses">—</div><div class="klbl">Total Uses</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--purple)"></div><i class="material-icons kico">link</i><div class="kval" id="sec-refs">—</div><div class="klbl">In Use by Endpoints</div></div>
+  </div>
+
+  <!-- Secrets grid -->
+  <div id="sec-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:13px">
+    <div class="empty" style="grid-column:1/-1;padding:50px 20px"><i class="material-icons">lock</i><p>No secrets yet — create your first one</p></div>
+  </div>
+</div>
+
+<div id="pg-tester" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">
+    <div><div class="ph"><span>/test</span> — Endpoint Tester</div><div class="psub">Send live requests · history · code generation</div></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn-g" onclick="clearTestHistory()" title="Clear history"><i class="material-icons" style="font-size:14px">delete_sweep</i>Clear History</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:260px 1fr 1fr;gap:13px" id="tester-grid">
+
+    <!-- LEFT: history panel -->
+    <div class="card cp" style="padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:78vh">
+      <div style="padding:10px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:.71rem;font-weight:700;color:var(--t1)"><i class="material-icons" style="font-size:13px;vertical-align:middle;margin-right:4px">history</i>History</span>
+        <span id="th-count" style="font-size:.62rem;color:var(--t3)">0 requests</span>
+      </div>
+      <div id="th-list" style="flex:1;overflow-y:auto;scrollbar-width:thin">
+        <div id="th-empty" style="padding:30px 15px;text-align:center;color:var(--t3);font-size:.7rem"><i class="material-icons" style="font-size:22px;display:block;margin-bottom:6px;opacity:.3">history</i>No requests yet</div>
+      </div>
+    </div>
+
+    <!-- MIDDLE: request builder -->
+    <div class="card cp">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+        <span style="font-size:.71rem;font-weight:700;color:var(--t1)">Request</span>
+        <div style="display:flex;gap:5px">
+          <select id="t-ep-load" onchange="loadEpIntoTester(this.value)" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:3px 7px;font-size:.65rem;font-family:var(--ui)">
+            <option value="">Load endpoint…</option>
+          </select>
+          <button class="btn-i" onclick="openCodeGen()" title="Generate code"><i class="material-icons" style="font-size:14px">code</i></button>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px;margin-bottom:9px">
+        <select id="t-method" style="background:var(--surf);color:var(--t1);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 8px;font-size:.72rem;font-weight:700;font-family:var(--mono);width:100px;flex-shrink:0">
+          <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option>
+        </select>
+        <input type="text" id="t-path" placeholder="virtual/path" style="flex:1;background:var(--surf);color:var(--t1);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 10px;font-family:var(--mono);font-size:.72rem;outline:none" onfocus="this.style.borderColor='var(--a)'" onblur="this.style.borderColor='var(--border)'"/>
+      </div>
+      <div class="fsep">Headers</div>
+      <div id="t-hdrs" style="margin-bottom:7px"></div>
+      <div style="display:flex;gap:5px;margin-bottom:9px">
+        <button class="addrow" onclick="addHdr('t-hdrs')"><i class="material-icons" style="font-size:.82rem">add_circle_outline</i>Header</button>
+        <input type="text" id="t-apikey" placeholder="x-api-key value (shortcut)" style="flex:1;background:var(--surf);color:var(--t1);border:1px solid var(--border);border-radius:var(--rsm);padding:4px 8px;font-family:var(--mono);font-size:.65rem;outline:none" onfocus="this.style.borderColor='var(--a)'" onblur="this.style.borderColor='var(--border)'" title="Shortcut: fills x-api-key header"/>
+      </div>
+      <div class="fsep">Query Params</div>
+      <textarea class="code-a" id="t-query" rows="2" placeholder="userId=123&#10;page=1" style="min-height:44px;margin-bottom:9px"></textarea>
+      <div class="fsep">Body (JSON)</div>
+      <textarea class="code-a" id="t-body" rows="5" placeholder='{"key":"value"}'></textarea>
+      <div class="fsep" style="margin-top:7px">File Upload</div>
+      <input type="file" id="t-file" style="color:var(--t2);font-size:.71rem;margin-bottom:11px;width:100%"/>
+      <div style="display:flex;gap:7px;margin-top:4px">
+        <button class="btn-p" onclick="runTest()" id="t-send-btn"><i class="material-icons" style="font-size:14px">send</i>Send</button>
+        <button class="btn-g" onclick="clearTest()">Clear</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: response -->
+    <div class="card cp" style="min-height:320px;display:flex;flex-direction:column">
+      <div id="t-empty" class="empty" style="padding:60px 20px;flex:1"><i class="material-icons">science</i><p>Send a request to see the response</p></div>
+      <div id="t-result" style="display:none;flex:1;flex-direction:column">
+        <div style="display:flex;gap:7px;align-items:center;margin-bottom:11px;flex-wrap:wrap">
+          <span id="t-hbadge" class="badge"></span>
+          <span id="t-mbadge" class="badge"></span>
+          <span id="t-kbadge"></span>
+          <span id="t-cbadge" class="badge bcache" style="display:none"><i class="material-icons" style="font-size:.72rem">bolt</i>CACHE HIT</span>
+          <span id="t-dur" style="font-size:.63rem;color:var(--t3);font-family:var(--mono)"></span>
+          <div style="flex:1"></div>
+          <button class="btn-i" id="t-dlbtn" style="display:none" onclick="dlTestFile()" title="Download file"><i class="material-icons" style="font-size:13px">download</i></button>
+          <button class="btn-i" onclick="copyTestResponse()" title="Copy response"><i class="material-icons" style="font-size:13px">content_copy</i></button>
+        </div>
+        <div class="fsep">Response Body</div>
+        <pre class="code-a" id="t-body-out" style="flex:1;min-height:120px;overflow:auto;white-space:pre-wrap;margin-bottom:9px"></pre>
+        <div class="fsep">Meta / Events</div>
+        <pre class="code-a" id="t-meta-out" style="min-height:44px;overflow:auto;white-space:pre-wrap;color:var(--purple)"></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- SECURITY EVENTS -->
+<div id="pg-security" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div class="ph"><span>/security</span> — Security Events</div>
+      <div class="psub">Rate limits · IP blocks · Threat detections · HMAC failures · Fingerprints</div>
+    </div>
+    <button class="btn-g" onclick="loadGlobalSecEvents()"><i class="material-icons" style="font-size:14px">refresh</i>Refresh</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kgrid" style="margin-bottom:16px">
+    <div class="kpi"><div class="kbar" style="background:var(--danger)"></div><i class="material-icons kico">block</i><div class="kval" id="gsec-total">—</div><div class="klbl">Events 24h</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--warn)"></div><i class="material-icons kico">speed</i><div class="kval" id="gsec-rl">—</div><div class="klbl">Rate Limited</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--danger)"></div><i class="material-icons kico">bug_report</i><div class="kval" id="gsec-threat">—</div><div class="klbl">Threats</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--purple)"></div><i class="material-icons kico">public</i><div class="kval" id="gsec-ip">—</div><div class="klbl">IP Blocks</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><i class="material-icons kico">fingerprint</i><div class="kval" id="gsec-blocked">—</div><div class="klbl">Repeat IPs</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 280px;gap:13px;align-items:start">
+
+    <!-- Event list -->
+    <div class="card cp" style="padding:0;overflow:hidden">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:.71rem;font-weight:700;color:var(--t1)">Recent Security Events <span style="font-size:.6rem;color:var(--t3)">(last 100)</span></span>
+        <div style="display:flex;gap:7px;align-items:center">
+          <select id="gsec-type-filter" onchange="filterSecEvents()" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:3px 7px;font-size:.65rem;font-family:var(--ui)">
+            <option value="">All types</option>
+            <option value="rate_limit_exceeded">Rate Limit</option>
+            <option value="ip_blocked">IP Blocked</option>
+            <option value="ip_not_allowed">IP Not Allowed</option>
+            <option value="threat_detected">Threat</option>
+            <option value="fingerprint_blocked">Fingerprint</option>
+            <option value="hmac_invalid">HMAC Invalid</option>
+            <option value="body_too_large">Body Too Large</option>
+            <option value="cors_rejected">CORS</option>
+          </select>
+        </div>
+      </div>
+      <div id="gsec-events" style="max-height:600px;overflow-y:auto;padding:0 14px">
+        <div class="empty" style="padding:50px"><i class="material-icons">security</i><p>Click Refresh to load events</p></div>
+      </div>
+    </div>
+
+    <!-- Sidebar: top offenders + type breakdown -->
+    <div style="display:flex;flex-direction:column;gap:13px">
+
+      <!-- Top IPs -->
+      <div class="card cp">
+        <div style="font-size:.71rem;font-weight:700;color:var(--t1);margin-bottom:11px"><i class="material-icons" style="font-size:14px;vertical-align:middle;margin-right:4px">public</i>Top Offending IPs</div>
+        <div id="gsec-top-ips"><div style="font-size:.68rem;color:var(--t3)">Load events to see data</div></div>
+      </div>
+
+      <!-- Type breakdown -->
+      <div class="card cp">
+        <div style="font-size:.71rem;font-weight:700;color:var(--t1);margin-bottom:11px"><i class="material-icons" style="font-size:14px;vertical-align:middle;margin-right:4px">pie_chart</i>By Type (24h)</div>
+        <div id="gsec-bytype"><div style="font-size:.68rem;color:var(--t3)">Load events to see data</div></div>
+      </div>
+
+      <!-- Rate limit live counters -->
+      <div class="card cp">
+        <div style="font-size:.71rem;font-weight:700;color:var(--t1);margin-bottom:7px"><i class="material-icons" style="font-size:14px;vertical-align:middle;margin-right:4px">speed</i>Rate Limit Manager</div>
+        <div style="font-size:.65rem;color:var(--t3);margin-bottom:9px">Select an endpoint to view and manage active rate-limit counters.</div>
+        <select id="gsec-rl-ep-sel" onchange="loadRLCounters()" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 8px;width:100%;font-family:var(--ui);font-size:.7rem;margin-bottom:9px">
+          <option value="">Select endpoint…</option>
+        </select>
+        <div id="gsec-rl-counters"><div style="font-size:.65rem;color:var(--t3)">No endpoint selected</div></div>
+        <div style="margin-top:9px;display:flex;gap:5px">
+          <button class="btn-g btn-sm" onclick="clearRLForEp()"><i class="material-icons" style="font-size:12px">delete_sweep</i>Clear Counters</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ENVIRONMENTS PAGE -->
+<div id="pg-environments" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div class="ph"><span>/environments</span> — Environments</div>
+      <div class="psub">Define variable sets with <code style="font-family:var(--mono);color:var(--a)">[[VAR_NAME]]</code> syntax · Switch active env from the nav bar</div>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn-g" onclick="openEnvModal()"><i class="material-icons" style="font-size:14px">add</i>New Environment</button>
+    </div>
+  </div>
+
+  <!-- How-to hint -->
+  <div class="shint" style="margin-bottom:16px">
+    <strong>How it works:</strong> Create an environment with variables (e.g. <code>BASE_URL</code>, <code>API_VERSION</code>).
+    Use <code style="color:var(--a)">[[BASE_URL]]</code> in your endpoint Destination URL or headers.
+    The active environment's values are resolved at proxy time — before secrets (<code>{{SECRET}}</code>) are resolved.
+    You can combine both syntaxes: <code style="color:var(--a)">[[BASE_URL]]/v[[API_VERSION]]/users?key={{MY_SECRET}}</code>
+  </div>
+
+  <!-- Env cards grid -->
+  <div id="env-grid" class="env-grid">
+    <div class="empty" style="grid-column:1/-1;padding:60px">
+      <i class="material-icons">layers</i>
+      <p>No environments yet — create one to start</p>
+    </div>
+  </div>
+
+  <!-- Import modal trigger -->
+  <div style="padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:13px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:.76rem;font-weight:700;color:var(--t1)">Import OpenAPI / Swagger</div>
+      <div style="font-size:.65rem;color:var(--t3)">Bulk-create endpoints from an OpenAPI 3.x or Swagger 2.x spec</div>
+    </div>
+    <button class="btn-w" onclick="openImportModal()"><i class="material-icons" style="font-size:14px">upload_file</i>Import Spec</button>
+  </div>
+</div>
+
+<!-- ENVIRONMENT EDIT MODAL -->
+<div id="modal-env" class="modal" style="display:none">
+  <div class="modal-box" style="max-width:680px">
+    <div class="modal-hdr">
+      <span id="env-modal-title">New Environment</span>
+      <button class="btn-i" onclick="closeMod('modal-env')"><i class="material-icons">close</i></button>
+    </div>
+
+    <input type="hidden" id="env-id"/>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:11px;align-items:end">
+      <div class="input-field" style="margin:0">
+        <input type="text" id="env-name" placeholder="Production"/>
+        <label class="active">Environment Name</label>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <label style="font-size:.65rem;color:var(--t3)">Color</label>
+        <input type="color" id="env-color" value="#6c63ff"
+          style="width:32px;height:32px;border:none;background:none;cursor:pointer;border-radius:4px"/>
+      </div>
+    </div>
+    <div class="input-field" style="margin:0 0 13px">
+      <input type="text" id="env-desc" placeholder="Live production API"/>
+      <label class="active">Description</label>
+    </div>
+
+    <!-- Variables editor -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:.71rem;font-weight:700;color:var(--t1)">Variables</span>
+      <button class="btn-g btn-sm" onclick="addEnvVar()"><i class="material-icons" style="font-size:12px">add</i>Add Variable</button>
+    </div>
+    <div style="font-size:.62rem;color:var(--t3);margin-bottom:9px">
+      Use <code style="color:var(--a)">[[VARIABLE_NAME]]</code> in endpoint URLs and headers. Names: uppercase letters, numbers, underscores only.
+    </div>
+    <div id="env-vars-container" style="max-height:320px;overflow-y:auto">
+      <!-- rows injected by JS -->
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn-w" onclick="closeMod('modal-env')">Cancel</button>
+      <button class="btn-a" onclick="saveEnv()"><i class="material-icons" style="font-size:14px">save</i>Save Environment</button>
+    </div>
+  </div>
+</div>
+
+<!-- OPENAPI IMPORT MODAL -->
+<div id="modal-import" class="modal" style="display:none">
+  <div class="modal-box" style="max-width:720px">
+    <div class="modal-hdr">
+      <span>Import OpenAPI / Swagger Spec</span>
+      <button class="btn-i" onclick="closeMod('modal-import')"><i class="material-icons">close</i></button>
+    </div>
+
+    <div class="itabs" style="margin-bottom:13px">
+      <div class="itab on" data-p="imp-p-paste">Paste JSON/YAML</div>
+      <div class="itab" data-p="imp-p-file">Upload File</div>
+      <div class="itab" data-p="imp-p-url">From URL</div>
+    </div>
+
+    <!-- Paste tab -->
+    <div id="imp-p-paste" class="ip">
+      <textarea id="imp-spec-text" class="code-a" rows="16"
+        placeholder='Paste your OpenAPI 3.x or Swagger 2.x spec here (JSON or YAML)...&#10;&#10;Example:&#10;{&#10;  "openapi": "3.0.0",&#10;  "info": { "title": "My API", "version": "1.0.0" },&#10;  "paths": { "/users": { "get": { ... } } }&#10;}'
+        style="font-size:.68rem;resize:vertical"></textarea>
+    </div>
+
+    <!-- File tab -->
+    <div id="imp-p-file" class="ip" style="display:none">
+      <div style="border:2px dashed var(--border);border-radius:var(--r);padding:40px;text-align:center;cursor:pointer" onclick="document.getElementById('imp-file-input').click()">
+        <i class="material-icons" style="font-size:36px;color:var(--t3);display:block;margin-bottom:9px">upload_file</i>
+        <div style="font-size:.76rem;color:var(--t2)">Click to select or drag & drop</div>
+        <div style="font-size:.65rem;color:var(--t3);margin-top:5px">.json, .yaml, .yml files</div>
+      </div>
+      <input type="file" id="imp-file-input" accept=".json,.yaml,.yml" style="display:none" onchange="loadImportFile(this)"/>
+      <div id="imp-file-name" style="margin-top:9px;font-size:.68rem;color:var(--ok);display:none"></div>
+    </div>
+
+    <!-- URL tab -->
+    <div id="imp-p-url" class="ip" style="display:none">
+      <div class="input-field" style="margin:0 0 11px">
+        <input type="url" id="imp-url" placeholder="https://petstore.swagger.io/v2/swagger.json"/>
+        <label class="active">Spec URL (must be publicly accessible)</label>
+      </div>
+      <button class="btn-g btn-sm" onclick="fetchImportUrl()"><i class="material-icons" style="font-size:12px">cloud_download</i>Fetch</button>
+      <div id="imp-url-status" style="font-size:.65rem;margin-top:8px;color:var(--t3)"></div>
+    </div>
+
+    <!-- Options -->
+    <div style="margin-top:13px;padding:11px;background:var(--surf);border-radius:var(--rsm);border:1px solid var(--border)">
+      <div style="font-size:.69rem;font-weight:700;color:var(--t1);margin-bottom:8px">Import Options</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:7px;font-size:.68rem;cursor:pointer">
+          <input type="checkbox" id="imp-skip-existing" class="filled-in" checked/>
+          <span>Skip duplicate paths (same method + path)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:.68rem;cursor:pointer">
+          <input type="checkbox" id="imp-use-tags" class="filled-in" checked/>
+          <span>Group by first tag → Collection</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Preview area -->
+    <div id="imp-preview" style="display:none;margin-top:13px">
+      <div class="fsep" style="margin-bottom:9px">Preview — endpoints to be created</div>
+      <div id="imp-preview-list" style="max-height:200px;overflow-y:auto;font-size:.68rem"></div>
+    </div>
+
+    <!-- Result -->
+    <div id="imp-result" style="display:none;margin-top:13px"></div>
+
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn-w" onclick="previewImport()"><i class="material-icons" style="font-size:14px">preview</i>Preview</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-w" onclick="closeMod('modal-import')">Cancel</button>
+        <button id="imp-btn" class="btn-a" onclick="runImport()"><i class="material-icons" style="font-size:14px">upload</i>Import</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /pw -->
+
+<!-- ENDPOINT MODAL -->
+<div id="modal-ep" class="modal" style="width:900px;max-width:98vw">
+  <div class="mhdr"><h5 id="ep-title">New Endpoint</h5></div>
+  <div class="modal-content" style="overflow-y:auto;max-height:calc(92vh - 115px)">
+    <div class="row" style="margin:0">
+      <div class="input-field col s12 m8"><input type="text" id="ep-name"/><label>Name *</label></div>
+      <div class="input-field col s12 m4"><select id="ep-method"><option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option></select><label>Method *</label></div>
+      <div class="input-field col s12"><input type="text" id="ep-path" placeholder="users/list"/><label class="active">Virtual Path * <span style="color:var(--t3);font-size:.6rem">→ /api/{path}</span></label></div>
+      <div class="input-field col s12 m6">
+        <input type="text" id="ep-collection" list="ep-collection-list" placeholder="e.g. Auth, Payments, Users"/>
+        <datalist id="ep-collection-list"></datalist>
+        <label class="active">Collection / Folder <span style="color:var(--t3);font-size:.6rem">(optional)</span></label>
+      </div>
+      <div class="input-field col s12"><input type="text" id="ep-desc"/><label>Description</label></div>
+    </div>
+    <div class="itabs">
+      <div class="itab on" data-p="ep-pdest">Destination</div>
+      <div class="itab" data-p="ep-pparams">Params</div>
+      <div class="itab" data-p="ep-pmock">Mock</div>
+      <div class="itab" data-p="ep-pfiles">Files</div>
+      <div class="itab" data-p="ep-pcache">Cache</div>
+      <div class="itab" data-p="ep-psec">Security</div>
+      <div class="itab" data-p="ep-pevs">Events</div>
+      <div class="itab" data-p="ep-pcurl">cURL</div>
+    </div>
+    <div id="ep-pdest" class="ip">
+      <div class="row" style="margin:0">
+        <div class="col s12" style="margin-bottom:0;padding:0 0.75rem">
+          <div style="position:relative">
+            <div class="input-field" style="margin:0">
+              <input type="text" id="ep-dest-url" placeholder="https://api.example.com/v1/resource  or  [[BASE_URL]]/resource"/>
+              <label class="active">Destination URL <span style="color:var(--t3)">(empty = Mock)</span></label>
+            </div>
+            <div style="position:absolute;right:4px;top:50%;transform:translateY(-50%);display:flex;gap:4px">
+              <button type="button" class="btn-i" onclick="insertEnvRef('ep-dest-url')" title="Insert [[ENV_VAR]] reference"
+                style="font-size:.6rem;padding:2px 5px;height:22px">[[var]]</button>
+              <button type="button" class="btn-i" onclick="insertSecretRef('ep-dhdrs')" title="Insert {{SECRET}} reference"
+                style="font-size:.6rem;padding:2px 5px;height:22px">{{sec}}</button>
+            </div>
+          </div>
+        </div>
+        <div class="input-field col s6"><input type="number" id="ep-timeout" value="30000"/><label class="active">Timeout (ms)</label></div>
+        <div class="col s6" style="padding-top:26px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="ep-enabled" checked class="filled-in"/><span style="font-size:.8rem">Enabled</span></label></div>
+      </div>
+      <div class="fsep">Destination Headers</div>
+      <div id="ep-dhdrs"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px">
+        <button class="addrow" onclick="addHdr('ep-dhdrs')"><i class="material-icons" style="font-size:.82rem">add_circle_outline</i>Add header</button>
+        <button class="addrow" style="color:var(--warn)" onclick="insertSecretRef('ep-dhdrs')"><i class="material-icons" style="font-size:.82rem">lock</i>Insert secret ref</button>
+      </div>
+      <div id="ep-sec-hint" style="display:none;margin-top:5px;padding:6px 10px;background:var(--wdim);border:1px solid rgba(255,188,66,.18);border-radius:var(--rsm);font-size:.65rem;color:var(--warn)">
+        <strong>Tip:</strong> use <code style="font-family:var(--mono)">{{SECRET_NAME}}</code> in header values — e.g. <code style="font-family:var(--mono)">Bearer {{GITHUB_TOKEN}}</code>
+      </div>
+    </div>
+    <div id="ep-pparams" class="ip" style="display:none">
+      <div class="fsep">Query Params</div><div id="ep-qp"></div><button class="addrow" onclick="addPrm('ep-qp')"><i class="material-icons" style="font-size:.82rem">add_circle_outline</i>Query param</button>
+      <div class="fsep">Body Params</div><div id="ep-bp"></div><button class="addrow" onclick="addPrm('ep-bp')"><i class="material-icons" style="font-size:.82rem">add_circle_outline</i>Body param</button>
+    </div>
+    <div id="ep-pmock" class="ip" style="display:none">
+      <div class="row" style="margin:0">
+        <div class="input-field col s4"><input type="number" id="ep-mock-st" value="200"/><label class="active">Status Code</label></div>
+        <div class="input-field col s4"><input type="number" id="ep-mock-delay" value="0"/><label class="active">Delay (ms)</label></div>
+      </div>
+      <div class="fsep">Response Body (JSON)</div>
+      <textarea class="code-a" id="ep-mock-body" rows="6" placeholder='{"message":"ok","data":[]}'></textarea>
+      <div class="fsep">Response Headers</div>
+      <div id="ep-mhdrs"></div><button class="addrow" onclick="addHdr('ep-mhdrs')"><i class="material-icons" style="font-size:.82rem">add_circle_outline</i>Add header</button>
+    </div>
+    <div id="ep-pfiles" class="ip" style="display:none">
+      <div style="padding:9px 0 12px;border-bottom:1px solid var(--border)"><label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:600"><input type="checkbox" id="ep-fon" class="filled-in" onchange="toggleFileS()"/><span>Enable file support</span></label></div>
+      <div id="file-s" style="display:none;margin-top:12px">
+        <div class="row" style="margin:0">
+          <div class="input-field col s4"><select id="ep-fmode"><option value="upload">Upload</option><option value="download">Download</option><option value="both">Both</option></select><label>Mode</label></div>
+          <div class="input-field col s4"><input type="text" id="ep-ffield" value="file"/><label class="active">Field Name</label></div>
+          <div class="input-field col s4"><input type="number" id="ep-fmax" value="10"/><label class="active">Max MB</label></div>
+        </div>
+        <div class="fsep">Mock file response</div>
+        <div class="fbox"><p style="font-size:.71rem;color:var(--t2);margin-bottom:7px">File to serve as mock response:</p>
+          <input type="file" id="ep-mfile" onchange="loadMockFile()" style="color:var(--t2);font-size:.71rem"/>
+          <div id="ep-mfile-info" style="display:none;margin-top:5px;font-size:.68rem;color:var(--ok);font-family:var(--mono)"></div>
+        </div>
+        <input type="hidden" id="ep-mfb64"/><input type="hidden" id="ep-mfname"/><input type="hidden" id="ep-mfmime"/>
+      </div>
+    </div>
+    <div id="ep-pcache" class="ip" style="display:none">
+      <div style="padding:9px 0 12px;border-bottom:1px solid var(--border)"><label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:600"><input type="checkbox" id="ep-con" class="filled-in" onchange="toggleCacheS()"/><span>Enable in-memory cache</span></label></div>
+      <div id="cache-s" style="display:none;margin-top:12px">
+        <div class="row" style="margin:0">
+          <div class="input-field col s4"><input type="number" id="ep-cttl" value="60"/><label class="active">TTL (seconds)</label></div>
+          <div class="col s4" style="padding-top:24px"><label style="display:flex;align-items:center;gap:7px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="ep-cnobody" class="filled-in"/><span style="font-size:.78rem">Ignore body</span></label></div>
+          <div class="col s4" style="padding-top:24px"><label style="display:flex;align-items:center;gap:7px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="ep-cnoquery" class="filled-in"/><span style="font-size:.78rem">Ignore query</span></label></div>
+        </div>
+        <div class="cbox">Key = <code>sha1(endpointId + query + body)</code><br/>Header <code>X-Cache: HIT</code> on cache hits.<br/><span style="color:var(--warn)">⚠ Cache resets on server restart.</span></div>
+      </div>
+    </div>
+    <div id="ep-psec" class="ip" style="display:none">
+      <!-- ── API KEY (existing) ── -->
+      <div style="padding:9px 0 12px;border-bottom:1px solid var(--border)"><label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:600"><input type="checkbox" id="ep-keon" class="filled-in" onchange="toggleKeyS()"/><span>Require x-api-key</span></label></div>
+      <div id="key-s" style="display:none;margin-top:12px;margin-bottom:13px">
+        <div class="kbox">
+          <div style="font-size:.66rem;color:var(--t3)">Active key:</div>
+          <div class="kv" id="key-disp">—</div>
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <div class="input-field" style="margin:0;flex:1;max-width:90px"><input type="number" id="ep-klen" value="32" min="8" max="128"/><label class="active" style="font-size:.63rem">Length</label></div>
+            <button class="btn-w btn-sm" onclick="genKey()"><i class="material-icons" style="font-size:12px">autorenew</i>Generate</button>
+            <button class="btn-g btn-sm" onclick="copyKey()"><i class="material-icons" style="font-size:12px">content_copy</i>Copy</button>
+          </div>
+          <div style="margin-top:9px;font-size:.65rem;color:var(--t3)">Header: <code style="color:var(--warn);font-family:var(--mono)">x-api-key: &lt;key&gt;</code> or query <code style="color:var(--warn);font-family:var(--mono)">?x-api-key=&lt;key&gt;</code></div>
+        </div>
+      </div>
+
+      <!-- ── SECURITY MODULE MASTER TOGGLE ── -->
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--surf);border-radius:var(--rsm);margin-bottom:13px;border:1px solid var(--border)">
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer;flex:1"><input type="checkbox" id="ep-sec-on" class="filled-in" onchange="toggleEpSecPanel()"/><span style="font-weight:700">Enable Security Module</span></label>
+        <span class="enc-badge" style="font-size:.6rem"><i class="material-icons" style="font-size:12px">shield</i>Rate Limit · IP Control · Fingerprint · Threats · HMAC</span>
+      </div>
+      <div id="sec-panel" style="display:none">
+
+        <!-- sub-tabs -->
+        <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:13px">
+          <button class="lang-tab on" data-sp="sp-rl" onclick="switchEpSecTab(this,'sp-rl')"><i class="material-icons" style="font-size:12px">speed</i>Rate Limit</button>
+          <button class="lang-tab" data-sp="sp-ip" onclick="switchEpSecTab(this,'sp-ip')"><i class="material-icons" style="font-size:12px">public</i>IP Control</button>
+          <button class="lang-tab" data-sp="sp-fp" onclick="switchEpSecTab(this,'sp-fp')"><i class="material-icons" style="font-size:12px">fingerprint</i>Fingerprint</button>
+          <button class="lang-tab" data-sp="sp-td" onclick="switchEpSecTab(this,'sp-td')"><i class="material-icons" style="font-size:12px">bug_report</i>Threats</button>
+          <button class="lang-tab" data-sp="sp-hmac" onclick="switchEpSecTab(this,'sp-hmac')"><i class="material-icons" style="font-size:12px">verified_user</i>HMAC Signing</button>
+          <button class="lang-tab" data-sp="sp-cors" onclick="switchEpSecTab(this,'sp-cors')"><i class="material-icons" style="font-size:12px">open_in_new</i>CORS</button>
+        </div>
+
+        <!-- Rate Limit -->
+        <div id="sp-rl" class="sp">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:11px;cursor:pointer"><input type="checkbox" id="ep-rl-on" class="filled-in"/><span style="font-weight:600">Enable Rate Limiting</span></label>
+          <div class="drow d3">
+            <div class="input-field" style="margin:0"><input type="number" id="ep-rl-reqs" value="60" min="1"/><label class="active" style="font-size:.65rem">Max Requests</label></div>
+            <div class="input-field" style="margin:0"><input type="number" id="ep-rl-win" value="60" min="1"/><label class="active" style="font-size:.65rem">Window (seconds)</label></div>
+            <div class="input-field" style="margin:0"><input type="number" id="ep-rl-block" value="0" min="0" placeholder="0 = no block"/><label class="active" style="font-size:.65rem">Block Duration (s)</label></div>
+          </div>
+          <div class="input-field" style="margin-top:10px">
+            <select id="ep-rl-strat" class="browser-default" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 9px;width:100%;font-family:var(--ui);font-size:.74rem">
+              <option value="ip">Per IP address</option>
+              <option value="apikey">Per API Key</option>
+              <option value="fingerprint">Per Device Fingerprint</option>
+              <option value="global">Global (all clients combined)</option>
+            </select>
+            <label class="active" style="font-size:.65rem">Limit Strategy</label>
+          </div>
+          <div class="shint" style="margin-top:7px">
+            <strong>Response headers:</strong> <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>Retry-After</code> — standard RFC 6585 format.
+            Block duration = 0 means reject immediately without blocking future requests.
+          </div>
+        </div>
+
+        <!-- IP Control -->
+        <div id="sp-ip" class="sp" style="display:none">
+          <div class="drow d2">
+            <div>
+              <div class="fsep" style="margin-bottom:7px"><i class="material-icons" style="font-size:12px;vertical-align:middle;color:var(--ok)">check_circle</i> Allowlist <span style="font-size:.6rem;color:var(--t3)">(only these IPs may pass)</span></div>
+              <textarea id="ep-ip-allow" class="code-a" rows="5" placeholder="192.168.1.10&#10;10.0.0.0/8&#10;172.16.0.&#10;(one per line, CIDR supported)"></textarea>
+            </div>
+            <div>
+              <div class="fsep" style="margin-bottom:7px"><i class="material-icons" style="font-size:12px;vertical-align:middle;color:var(--danger)">block</i> Blocklist <span style="font-size:.6rem;color:var(--t3)">(always blocked)</span></div>
+              <textarea id="ep-ip-block" class="code-a" rows="5" placeholder="1.2.3.4&#10;5.6.7.0/24&#10;(one per line, CIDR supported)"></textarea>
+            </div>
+          </div>
+          <div class="shint" style="margin-top:7px">
+            Supports exact IPs, CIDR notation (e.g. <code>192.168.0.0/16</code>) and prefix wildcards (e.g. <code>10.0.</code>).
+            Blocklist is checked first, then allowlist. Empty allowlist = allow all.
+            Real IP resolved from <code>X-Forwarded-For</code> → <code>X-Real-IP</code> → socket.
+          </div>
+        </div>
+
+        <!-- Fingerprinting -->
+        <div id="sp-fp" class="sp" style="display:none">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:11px;cursor:pointer"><input type="checkbox" id="ep-fp-on" class="filled-in"/><span style="font-weight:600">Enable Device Fingerprinting</span></label>
+          <div class="shint" style="margin-bottom:11px">
+            Fingerprint = SHA-256 of <strong>IP + User-Agent + Accept-Language + Accept-Encoding + Sec-CH-UA headers</strong>.
+            A 16-char identifier unique to each client combination. Useful as a rate-limit strategy or for manual blocking.
+          </div>
+          <div class="fsep" style="margin-bottom:7px"><i class="material-icons" style="font-size:12px;vertical-align:middle;color:var(--danger)">block</i> Blocked Fingerprints</div>
+          <textarea id="ep-fp-blocklist" class="code-a" rows="4" placeholder="a1b2c3d4e5f60001&#10;(one fingerprint per line — 16 hex chars)"></textarea>
+          <div style="margin-top:9px;display:flex;gap:7px;align-items:center">
+            <span style="font-size:.68rem;color:var(--t3)">Fingerprint appears in security event logs and execution meta. Use it to identify repeat offenders.</span>
+          </div>
+          <div id="fp-live-list" style="margin-top:11px;display:none">
+            <div class="fsep" style="margin-bottom:7px">Active Fingerprints (live)</div>
+            <div id="fp-live-entries"></div>
+          </div>
+        </div>
+
+        <!-- Threat Detection -->
+        <div id="sp-td" class="sp" style="display:none">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:13px;cursor:pointer"><input type="checkbox" id="ep-td-on" class="filled-in"/><span style="font-weight:600">Enable Threat Detection</span></label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px">
+            <div class="sec-threat-card"><i class="material-icons" style="color:var(--danger)">storage</i><div><strong>SQL Injection</strong><div style="font-size:.63rem;color:var(--t3)">UNION SELECT, xp_, comments</div></div></div>
+            <div class="sec-threat-card"><i class="material-icons" style="color:var(--warn)">code</i><div><strong>XSS</strong><div style="font-size:.63rem;color:var(--t3)">&lt;script&gt;, javascript:, onerror=</div></div></div>
+            <div class="sec-threat-card"><i class="material-icons" style="color:var(--purple)">folder_open</i><div><strong>Path Traversal</strong><div style="font-size:.63rem;color:var(--t3)">../../../etc/passwd patterns</div></div></div>
+            <div class="sec-threat-card"><i class="material-icons" style="color:var(--ok)">terminal</i><div><strong>Command Injection</strong><div style="font-size:.63rem;color:var(--t3)">; && | backtick, rm, wget</div></div></div>
+            <div class="sec-threat-card"><i class="material-icons" style="color:var(--blue)">data_object</i><div><strong>NoSQL Injection</strong><div style="font-size:.63rem;color:var(--t3)">$where, $gt, $regex operators</div></div></div>
+            <div class="sec-threat-card"><i class="material-icons" style="color:var(--teal)">auto_fix_high</i><div><strong>SSTI</strong><div style="font-size:.63rem;color:var(--t3)">Template injection {{...}} ${{...}}</div></div></div>
+          </div>
+          <div class="shint" style="margin-top:11px">Scans query params, request body (recursively up to 5 levels deep) and referer/cookie headers. Returns HTTP 400 on detection.</div>
+          <div class="input-field" style="margin-top:10px">
+            <input type="number" id="ep-sec-bodymax" value="0" min="0" placeholder="0 = no limit"/>
+            <label class="active">Max Body Size (KB) — 0 = disabled</label>
+          </div>
+        </div>
+
+        <!-- HMAC -->
+        <div id="sp-hmac" class="sp" style="display:none">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:13px;cursor:pointer"><input type="checkbox" id="ep-hmac-on" class="filled-in"/><span style="font-weight:600">Enable HMAC Request Signing</span></label>
+          <div class="shint" style="margin-bottom:13px">
+            Callers must sign their requests with a shared secret. Relay verifies the signature before proxying.
+            <br/>Signed payload: <code style="font-family:var(--mono);color:var(--warn)">METHOD
+/path
+JSON(sortedQuery)
+JSON(sortedBody)</code>
+          </div>
+          <div class="drow d2">
+            <div class="input-field" style="margin:0">
+              <input type="text" id="ep-hmac-header" value="X-Signature" placeholder="X-Signature"/>
+              <label class="active" style="font-size:.65rem">Signature Header Name</label>
+            </div>
+            <div class="input-field" style="margin:0">
+              <select id="ep-hmac-algo" class="browser-default" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 9px;width:100%;font-family:var(--ui);font-size:.74rem">
+                <option value="sha256">HMAC-SHA256</option>
+                <option value="sha512">HMAC-SHA512</option>
+              </select>
+              <label class="active" style="font-size:.65rem">Algorithm</label>
+            </div>
+          </div>
+          <div style="position:relative;margin-top:11px">
+            <input type="password" id="ep-hmac-secret" placeholder="Shared HMAC secret (min 32 chars recommended)"
+              style="background:var(--surf);color:var(--t1);border:1px solid var(--border);border-radius:var(--rsm);padding:9px 42px 9px 11px;width:100%;font-family:var(--mono);font-size:.72rem;outline:none"/>
+            <button onclick="toggleHmacVis()" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t3)">
+              <i class="material-icons" id="hmac-eye-ico" style="font-size:18px">visibility</i>
+            </button>
+          </div>
+          <div style="display:flex;gap:7px;margin-top:9px">
+            <button class="btn-g btn-sm" onclick="genHmacSecret()"><i class="material-icons" style="font-size:12px">autorenew</i>Generate Secret</button>
+            <button class="btn-g btn-sm" onclick="copyHmacSnippet()"><i class="material-icons" style="font-size:12px">code</i>Copy signing snippet</button>
+          </div>
+          <div id="hmac-snippet" style="display:none;margin-top:11px">
+            <div class="fsep" style="margin-bottom:7px">Signing code (JavaScript)</div>
+            <pre class="code-a" id="hmac-snippet-out" style="font-size:.65rem;line-height:1.65"></pre>
+          </div>
+        </div>
+
+        <!-- CORS -->
+        <div id="sp-cors" class="sp" style="display:none">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:11px;cursor:pointer"><input type="checkbox" id="ep-cors-on" class="filled-in"/><span style="font-weight:600">Enable Per-Endpoint CORS</span></label>
+          <div class="shint" style="margin-bottom:11px">
+            Controls <code>Access-Control-Allow-Origin</code> per endpoint. Useful when different endpoints serve different frontends.
+            Overrides global CORS settings for this endpoint only.
+          </div>
+          <div class="fsep" style="margin-bottom:7px">Allowed Origins <span style="font-size:.6rem;color:var(--t3)">(one per line)</span></div>
+          <textarea id="ep-cors-origins" class="code-a" rows="5" placeholder="*&#10;https://app.example.com&#10;https://admin.example.com&#10;*.example.com"></textarea>
+        </div>
+
+        <!-- Security events live panel (readonly) -->
+        <div style="margin-top:16px;padding-top:13px;border-top:1px solid var(--border)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+            <span style="font-size:.71rem;font-weight:700;color:var(--t1)"><i class="material-icons" style="font-size:13px;vertical-align:middle;margin-right:4px">security</i>Recent Security Events</span>
+            <button class="btn-i" onclick="loadSecEvents()" title="Refresh"><i class="material-icons" style="font-size:13px">refresh</i></button>
+          </div>
+          <div id="ep-sec-events" style="max-height:160px;overflow-y:auto">
+            <div style="font-size:.68rem;color:var(--t3);padding:10px">Click refresh to load events for this endpoint.</div>
+          </div>
+        </div>
+
+      </div><!-- /sec-panel -->
+    </div>
+    <div id="ep-pevs" class="ip" style="display:none">
+      <p style="font-size:.72rem;color:var(--t3);margin-bottom:11px">Events fire before (PRE) and after (POST) each call.</p>
+      <div class="fsep">PRE Events</div>
+      <div id="ep-pre-pills" class="epills" style="margin-bottom:6px"></div>
+      <select id="ep-pre-sel" class="browser-default" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 9px;width:100%;margin-bottom:11px;font-family:var(--ui);font-size:.74rem"><option value="">— Add PRE event —</option></select>
+      <div class="fsep">POST Events</div>
+      <div id="ep-post-pills" class="epills" style="margin-bottom:6px"></div>
+      <select id="ep-post-sel" class="browser-default" style="background:var(--surf);color:var(--t2);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 9px;width:100%;font-family:var(--ui);font-size:.74rem"><option value="">— Add POST event —</option></select>
+    </div>
+    <div id="ep-pcurl" class="ip" style="display:none">
+      <p style="font-size:.71rem;color:var(--t3);margin-bottom:9px">Generated cURL for this endpoint via the Relay proxy.</p>
+      <div class="curlbox"><pre class="curlcode" id="ep-curl-pre">Fill in the form to preview cURL</pre></div>
+      <div style="display:flex;gap:7px;margin-top:8px">
+        <button class="btn-g btn-sm" onclick="copyCurl('ep-curl-pre')"><i class="material-icons" style="font-size:12px">content_copy</i>Copy</button>
+        <button class="btn-g btn-sm" onclick="refreshCurlPrev()"><i class="material-icons" style="font-size:12px">refresh</i>Refresh</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <input type="hidden" id="ep-id"/>
+    <button class="btn-g modal-close" style="margin-right:7px">Cancel</button>
+    <button class="btn-p" onclick="saveEp()"><i class="material-icons" style="font-size:14px">save</i>Save</button>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div id="modal-ev" class="modal" style="width:640px;max-width:98vw">
+  <div class="mhdr"><h5 id="ev-title">New Event</h5></div>
+  <div class="modal-content" style="overflow-y:auto;max-height:calc(92vh - 115px)">
+    <div class="row" style="margin:0">
+      <div class="input-field col s12 m7"><input type="text" id="ev-name"/><label>Name *</label></div>
+      <div class="input-field col s12 m5"><select id="ev-type" onchange="toggleEvType()"><option value="webhook">Webhook</option><option value="script">Script JS</option></select><label>Type *</label></div>
+      <div class="input-field col s12"><input type="text" id="ev-desc"/><label>Description</label></div>
+    </div>
+    <div id="ev-wh">
+      <div class="row" style="margin:0">
+        <div class="input-field col s3"><select id="ev-meth"><option>POST</option><option>GET</option><option>PUT</option></select><label>Method</label></div>
+        <div class="input-field col s9"><input type="text" id="ev-url" placeholder="https://hooks.example.com/notify"/><label class="active">Webhook URL</label></div>
+      </div>
+      <div class="fsep">Headers</div><div id="ev-hdrs"></div>
+      <button class="addrow" onclick="addHdr('ev-hdrs')"><i class="material-icons" style="font-size:.82rem">add_circle_outline</i>Add header</button>
+    </div>
+    <div id="ev-sc" style="display:none">
+      <div class="fsep">Script JS</div>
+      <textarea class="code-a" id="ev-script" rows="9" placeholder="ctx.extras.startTime = Date.now();&#10;return { ok: true };"></textarea>
+      <div class="shint">
+  <code>ctx.secrets.NAME</code> → decrypted secret value (read-only) ·
+  <code>ctx.extras</code> shared between pre/post ·
+  <code>ctx.response</code> only in post<br/>
+  <strong style="color:var(--warn)">Example:</strong>
+  <code>ctx.request.headers['Authorization'] = `Bearer ${ctx.secrets.MY_TOKEN}`;</code>
+</div>
+    </div>
+    <div style="margin-top:11px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="ev-enabled" checked class="filled-in"/><span style="font-size:.79rem">Enabled</span></label></div>
+  </div>
+  <div class="modal-footer">
+    <input type="hidden" id="ev-id"/>
+    <button class="btn-g modal-close" style="margin-right:7px">Cancel</button>
+    <button class="btn-p" onclick="saveEv()"><i class="material-icons" style="font-size:14px">save</i>Save</button>
+  </div>
+</div>
+
+<!-- CURL IMPORT MODAL -->
+<div id="modal-curl" class="modal" style="width:680px;max-width:98vw">
+  <div class="mhdr"><h5>Import from cURL</h5></div>
+  <div class="modal-content">
+    <textarea class="code-a" id="curl-in" rows="7" placeholder="curl -X POST 'https://api.example.com/v1/users' -H 'Content-Type: application/json' -d '{&quot;name&quot;:&quot;John&quot;}'"></textarea>
+    <div id="curl-prev" style="display:none;margin-top:11px">
+      <div class="fsep">Parsed</div>
+      <div id="curl-parsed" class="curlbox" style="font-size:.71rem;color:var(--t2);margin-bottom:11px"></div>
+      <div class="row" style="margin:0">
+        <div class="input-field col s6"><input type="text" id="curl-name"/><label class="active">Endpoint Name</label></div>
+        <div class="input-field col s6"><input type="text" id="curl-path"/><label class="active">Virtual Path</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-g modal-close" style="margin-right:7px">Cancel</button>
+    <button class="btn-g" onclick="parseCurlIn()" style="margin-right:7px"><i class="material-icons" style="font-size:12px">auto_fix_high</i>Parse</button>
+    <button class="btn-p" id="curl-create" style="display:none" onclick="importCurl()"><i class="material-icons" style="font-size:14px">add</i>Create Endpoint</button>
+  </div>
+</div>
+
+<!-- EXECUTION DETAIL MODAL -->
+<div id="modal-exec" class="modal" style="width:820px;max-width:98vw">
+  <div class="mhdr"><h5 id="exec-title">Execution Detail</h5></div>
+  <div class="modal-content" style="overflow-y:auto;max-height:calc(92vh - 115px)">
+    <div class="itabs">
+      <div class="itab on" data-p="xp-ov">Overview</div>
+      <div class="itab" data-p="xp-req">Request</div>
+      <div class="itab" data-p="xp-res">Response</div>
+      <div class="itab" data-p="xp-ev">Events</div>
+      <div class="itab" data-p="xp-ext">ctx.extras</div>
+    </div>
+    <div id="xp-ov" class="ip">
+      <div class="kgrid" id="exec-kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:11px"></div>
+      <div class="fsep">Execution Timeline</div>
+      <div id="exec-tl"></div>
+    </div>
+    <div id="xp-req" class="ip" style="display:none"><pre class="code-a" id="exec-req" style="min-height:150px;overflow:auto;white-space:pre-wrap"></pre></div>
+    <div id="xp-res" class="ip" style="display:none"><pre class="code-a" id="exec-res" style="min-height:150px;overflow:auto;white-space:pre-wrap"></pre></div>
+    <div id="xp-ev"  class="ip" style="display:none"><pre class="code-a" id="exec-evs" style="min-height:150px;overflow:auto;white-space:pre-wrap;color:var(--purple)"></pre></div>
+    <div id="xp-ext" class="ip" style="display:none">
+      <p style="font-size:.69rem;color:var(--t3);margin-bottom:6px">Variables written to <code style="color:var(--a);font-family:var(--mono)">ctx.extras</code></p>
+      <pre class="code-a" id="exec-ext" style="min-height:80px;overflow:auto;white-space:pre-wrap;color:var(--warn)"></pre>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-g btn-sm" onclick="copyExecCurl()"><i class="material-icons" style="font-size:12px">terminal</i>Copy cURL</button>
+    <button class="btn-g modal-close" style="margin-left:7px">Close</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="/js/app.js"></script>
+
+<!-- SECRETS MODAL -->
+<div id="modal-sec" class="modal" style="width:660px;max-width:98vw">
+  <div class="mhdr"><h5 id="sec-modal-title">New Secret</h5></div>
+  <div class="modal-content" style="overflow-y:auto;max-height:calc(92vh - 115px)">
+
+    <div class="itabs">
+      <div class="itab on" data-p="sp-form">Details</div>
+      <div class="itab" data-p="sp-usage">Usage Guide</div>
+    </div>
+
+    <!-- Form panel -->
+    <div id="sp-form" class="ip">
+      <div class="row" style="margin:0">
+        <div class="input-field col s12 m7">
+          <input type="text" id="sec-name" oninput="normalizeSecName(this)" placeholder="GITHUB_TOKEN"/>
+          <label class="active">Name * <span style="color:var(--t3);font-size:.6rem">(UPPER_SNAKE_CASE)</span></label>
+        </div>
+        <div class="input-field col s12 m5">
+          <select id="sec-type">
+            <option value="api_key">API Key</option>
+            <option value="token">Token / JWT</option>
+            <option value="password">Password</option>
+            <option value="oauth_secret">OAuth Secret</option>
+            <option value="certificate">Certificate</option>
+            <option value="other">Other</option>
+          </select>
+          <label>Type</label>
+        </div>
+        <div class="input-field col s12">
+          <input type="text" id="sec-desc" placeholder="e.g. GitHub personal access token for CI webhooks"/>
+          <label class="active">Description</label>
+        </div>
+      </div>
+
+      <!-- Value field -->
+      <div id="sec-val-wrap">
+        <div class="fsep">Secret Value</div>
+        <div style="position:relative">
+          <input type="password" id="sec-val" autocomplete="new-password"
+            style="background:var(--surf);color:var(--t1);border:1px solid var(--border);border-radius:var(--rsm);padding:9px 42px 9px 11px;width:100%;font-family:var(--mono);font-size:.78rem;outline:none;transition:border-color .15s"
+            onfocus="this.style.borderColor='var(--a)'" onblur="this.style.borderColor='var(--border)'"
+            placeholder="Paste your secret value here…"/>
+          <button onclick="toggleSecValVis()" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t3)" id="sec-eye-btn">
+            <i class="material-icons" id="sec-eye-ico" style="font-size:18px">visibility</i>
+          </button>
+        </div>
+        <div id="sec-strength" style="margin-top:6px;display:none">
+          <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div id="sec-strength-bar" style="height:3px;border-radius:2px;transition:width .3s,background .3s;width:0"></div></div>
+          <div id="sec-strength-lbl" style="font-size:.6rem;margin-top:3px;color:var(--t3)"></div>
+        </div>
+        <p style="font-size:.62rem;color:var(--t3);margin-top:6px;line-height:1.6">
+          <i class="material-icons" style="font-size:.75rem;vertical-align:middle;color:var(--ok)">lock</i>
+          Encrypted with AES-256-GCM before storage. The raw value <strong>cannot be retrieved</strong> after saving — only rotated.
+        </p>
+      </div>
+
+      <!-- Edit mode notice -->
+      <div id="sec-edit-notice" style="display:none;margin-top:9px">
+        <div class="warn-box">
+          <i class="material-icons" style="font-size:16px;flex-shrink:0">warning</i>
+          <div>Leave value empty to keep the current secret. Fill in a new value to rotate it.</div>
+        </div>
+      </div>
+
+      <!-- Rotation history placeholder (UX) -->
+      <div id="sec-meta-block" style="display:none;margin-top:13px">
+        <div class="fsep">Usage Audit</div>
+        <div id="sec-audit-info" style="display:flex;gap:12px;flex-wrap:wrap;font-size:.71rem;color:var(--t2)"></div>
+      </div>
+    </div>
+
+    <!-- Usage Guide panel -->
+    <div id="sp-usage" class="ip" style="display:none">
+      <div class="slabel" style="margin-bottom:9px">Reference in endpoint headers / URL</div>
+      <div class="snippet-box" id="sec-usage-snippet1">Save the secret first to see examples.</div>
+      <div class="slabel" style="margin:13px 0 9px">Reference in PRE-event script</div>
+      <div class="snippet-box" id="sec-usage-snippet2">Save the secret first to see examples.</div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <input type="hidden" id="sec-id"/>
+    <button class="btn-g modal-close" style="margin-right:7px">Cancel</button>
+    <button class="btn-p" onclick="saveSec()"><i class="material-icons" style="font-size:14px">save</i>Save Secret</button>
+  </div>
+</div>
+
+
+<!-- CODE GEN MODAL -->
+<div id="modal-codegen" class="modal" style="width:820px;max-width:98vw">
+  <div class="mhdr">
+    <h5>Code Generation — <span id="cg-ep-name" style="color:var(--a)">Endpoint</span></h5>
+  </div>
+  <div class="modal-content" style="overflow-y:auto;max-height:calc(92vh - 130px)">
+    <!-- language tabs -->
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <button class="lang-tab on" data-lang="curl" onclick="switchLang(this,'curl')"><i class="material-icons" style="font-size:13px">terminal</i>cURL</button>
+      <button class="lang-tab" data-lang="fetch" onclick="switchLang(this,'fetch')"><i class="material-icons" style="font-size:13px">code</i>JS Fetch</button>
+      <button class="lang-tab" data-lang="axios" onclick="switchLang(this,'axios')">Axios</button>
+      <button class="lang-tab" data-lang="jquery" onclick="switchLang(this,'jquery')"><i class="material-icons" style="font-size:13px">bolt</i>jQuery</button>
+      <button class="lang-tab" data-lang="python" onclick="switchLang(this,'python')"><i class="material-icons" style="font-size:13px">code</i>Python</button>
+      <button class="lang-tab" data-lang="k6" onclick="switchLang(this,'k6')"><i class="material-icons" style="font-size:13px">speed</i>k6</button>
+      <button class="lang-tab" data-lang="php" onclick="switchLang(this,'php')">PHP</button>
+      <div style="flex:1"></div>
+      <button class="btn-g" onclick="copyCodeGen()"><i class="material-icons" style="font-size:13px">content_copy</i>Copy</button>
+    </div>
+    <!-- base url override -->
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+      <span style="font-size:.68rem;color:var(--t3);white-space:nowrap">Base URL:</span>
+      <input type="text" id="cg-baseurl" style="flex:1;background:var(--surf);color:var(--t1);border:1px solid var(--border);border-radius:var(--rsm);padding:5px 9px;font-family:var(--mono);font-size:.7rem;outline:none" onfocus="this.style.borderColor='var(--a)'" onblur="this.style.borderColor='var(--border)'" oninput="renderCodeGen()"/>
+      <label style="display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--t2);cursor:pointer;white-space:nowrap">
+        <input type="checkbox" id="cg-use-vars" onchange="renderCodeGen()"/> Use env vars
+      </label>
+    </div>
+    <pre class="code-out" id="cg-output"></pre>
+    <p style="font-size:.62rem;color:var(--t3);margin-top:9px;line-height:1.6">
+      <i class="material-icons" style="font-size:.75rem;vertical-align:middle;color:var(--warn)">warning</i>
+      Secret references <code style="font-family:var(--mono)">{{NAME}}</code> are shown as placeholders — never include real secrets in generated code.
+    </p>
+  </div>
+  <input type="hidden" id="cg-ep-id"/>
+  <div class="modal-footer">
+    <button class="btn-g modal-close">Close</button>
+  </div>
+</div>
+
+</body>
+</html>
