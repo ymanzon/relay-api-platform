@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -20,7 +21,16 @@ const publicPath = existsSync(devPublic) ? devPublic : prodPublic;
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/api-catalog'),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
+    }),
     ServeStaticModule.forRoot({ rootPath: publicPath, exclude: ['/api*', '/catalog*'] }),
     AppCacheModule,
     SecretsModule,       // ← Global, registers first so ProxyService can inject it
