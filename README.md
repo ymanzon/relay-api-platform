@@ -74,7 +74,7 @@ Relay is a **self-hosted API gateway** that runs on your own infrastructure. It 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/relay-api-platform.git
+git clone https://github.com/ymanzon/relay-api-platform.git
 cd relay-api-platform
 npm install
 ```
